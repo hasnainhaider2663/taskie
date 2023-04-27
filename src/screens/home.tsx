@@ -1,17 +1,20 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import AudioRecorder from '../components/recorder';
 
-const LoginScreen = ({ navigation}) => {
-  const closeScreen = () => {
-    navigation.goBack();
-  };
+const HomeScreen = ({navigation}) => {
+  
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login with Google</Text>
-      <TouchableOpacity style={styles.button} onPress={()=>navigation.goBack()}>
-        <Text style={styles.buttonText}>Sign in with Google</Text>
+    
+      <TouchableOpacity style={styles.button} >
+        <AudioRecorder></AudioRecorder>
       </TouchableOpacity>
+      <Button
+        title="Go to Login"
+        onPress={() => navigation.navigate('Login')}
+      />
     </View>
   );
 };
@@ -38,4 +41,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default HomeScreen;

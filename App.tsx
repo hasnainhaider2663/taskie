@@ -2,10 +2,12 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/screens/login';
+import HomeScreen from './src/screens/home';
 
 
 type RootStackParamList = {
   Login: undefined;
+  Home:undefined;
   // Add other screens here
 };
 
@@ -20,7 +22,7 @@ const firebaseConfig = {
   measurementId: "G-H7YDQWSVJR"
 };
 const App = () => {
-  // Initialize Firebase
+  // // Initialize Firebase
   // if (!firebase.apps.length) {
   //   firebase.initializeApp(firebaseConfig);
   // }
@@ -33,8 +35,11 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+
+        
         {/* Add other screens here */}
       </Stack.Navigator>
     </NavigationContainer>
