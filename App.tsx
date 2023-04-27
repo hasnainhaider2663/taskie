@@ -1,9 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import firebase from '@react-native-firebase/app';
-
-import { GoogleSignin } from 'react-native-google-signin';
 import LoginScreen from './src/screens/login';
 
 
@@ -24,15 +21,15 @@ const firebaseConfig = {
 };
 const App = () => {
   // Initialize Firebase
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  // if (!firebase.apps.length) {
+  //   firebase.initializeApp(firebaseConfig);
+  // }
   
 
   // Configure Google Sign-In
-  GoogleSignin.configure({
-    webClientId: '568178372932-3ndig3kbh0ukjnn2ssmes9n66g224url.apps.googleusercontent.com',
-  });
+  // GoogleSignin.configure({
+  //   webClientId: '568178372932-3ndig3kbh0ukjnn2ssmes9n66g224url.apps.googleusercontent.com',
+  // });
 
   return (
     <NavigationContainer>

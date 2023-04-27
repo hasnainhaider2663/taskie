@@ -1,28 +1,28 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { GoogleSignin } from 'react-native-google-signin';
-import auth from '@react-native-firebase/auth';
+// import { GoogleSignin } from 'react-native-google-signin';
+// import auth from '@react-native-firebase/auth';
 
 const LoginScreen = () => {
-  const signInWithGoogle = async () => {
-    try {
-      // Sign in with Google
-      const { idToken } = await GoogleSignin.signIn();
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     // Sign in with Google
+  //     const { idToken } = await GoogleSignin.signIn();
 
-      // Create a Google credential with the token
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+  //     // Create a Google credential with the token
+  //     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-      // Sign in with credential
-      await auth().signInWithCredential(googleCredential);
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  };
+  //     // Sign in with credential
+  //     await auth().signInWithCredential(googleCredential);
+  //   } catch (error) {
+  //     console.error('Login failed:', error);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login with Google</Text>
-      <TouchableOpacity style={styles.button} onPress={signInWithGoogle}>
+      <TouchableOpacity style={styles.button} >
         <Text style={styles.buttonText}>Sign in with Google</Text>
       </TouchableOpacity>
     </View>
