@@ -3,7 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/screens/login';
 import HomeScreen from './src/screens/home';
-
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import firebase from '@react-native-firebase/app';
 
 type RootStackParamList = {
   Login: undefined;
@@ -23,15 +24,15 @@ const firebaseConfig = {
 };
 const App = () => {
   // // Initialize Firebase
-  // if (!firebase.apps.length) {
-  //   firebase.initializeApp(firebaseConfig);
-  // }
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   
 
   // Configure Google Sign-In
-  // GoogleSignin.configure({
-  //   webClientId: '568178372932-3ndig3kbh0ukjnn2ssmes9n66g224url.apps.googleusercontent.com',
-  // });
+  GoogleSignin.configure({
+    webClientId: '568178372932-3ndig3kbh0ukjnn2ssmes9n66g224url.apps.googleusercontent.com',
+  });
 
   return (
     <NavigationContainer>
