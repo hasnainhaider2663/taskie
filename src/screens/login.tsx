@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 const LoginScreen = ({ navigation}) => {
   const closeScreen = () => {
@@ -9,7 +10,7 @@ const LoginScreen = ({ navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login with Google</Text>
-      <TouchableOpacity style={styles.button} onPress={()=>navigation.goBack()}>
+      <TouchableOpacity style={styles.button} onPress={()=>auth.}>
         <Text style={styles.buttonText}>Sign in with Google</Text>
       </TouchableOpacity>
     </View>
