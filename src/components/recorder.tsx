@@ -1,14 +1,20 @@
-import React, {Component} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { Component } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import RNFS from 'react-native-fs';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import { firebaseConfig } from '../../FirebaseConfig';
 
 type State = {
   isRecording: boolean;
   isPlaying: boolean;
   audioPath: string | null;
+  user?: any;
 };
 
 class AudioRecorder extends Component<{}, State> {
+  unsubscribeAuth: any;
   private audioRecorderPlayer: AudioRecorderPlayer;
 
   constructor(props: {}) {
@@ -47,15 +53,36 @@ class AudioRecorder extends Component<{}, State> {
           {this.state.isRecording
             ? 'Recording in progress...'
             : this.state.isPlaying
-            ? 'Playing...'
-            : ''}
+              ? 'Playing...'
+              : ''}
         </Text>
       </View>
     );
   }
 
+  componentDidMount(): void {
+    // Check if user is logged in
+    this.unsubscribeAuth = auth().onAuthStateChanged(user => {
+      console.log('----');
+      console.log('auth state changed');
+
+      if (user) {
+        this.setState({ user });
+
+        // this.props.navigation.navigate('Home')
+      } else {
+        this.setState({ user });
+        // this.props.navigation.navigate('Login')
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeAuth();
+  }
+
   startRecording = async () => {
-    this.setState({isRecording: true});
+    this.setState({ isRecording: true });
     const path = 'audioFile.m4a';
     const result = await this.audioRecorderPlayer.startRecorder(path);
     this.audioRecorderPlayer.addRecordBackListener((e: any) => {
@@ -66,12 +93,51 @@ class AudioRecorder extends Component<{}, State> {
   stopRecording = async () => {
     const result = await this.audioRecorderPlayer.stopRecorder();
     this.audioRecorderPlayer.removeRecordBackListener();
-    this.setState({isRecording: false, audioPath: result});
+    this.setState({ isRecording: false, audioPath: result }, () => {
+      this.uploadAudio('abc'); // Call the uploadAudio function after updating the state
+    });
   };
+
+  async uploadAudio(fname: string) {
+    if (this.state.audioPath) {
+      const filename = `${fname}.m4a`;
+      const uid = this.state.user.uid; // Replace with the appropriate user's UID
+      const token = await this.getFirebaseStorageToken(uid);
+      console.log('token', token)
+      if (!token) {
+        console.error('Failed to get Firebase Storage token');
+        return;
+      }
+
+      try {
+        const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.projectId
+          }/o}?uploadType=media&name=${encodeURIComponent(filename)}`;
+        const data = new FormData();
+        data.append('file', {
+          uri: this.state.audioPath,
+          type: 'audio/m4a',
+          name: filename,
+        });
+        console.log('url', url)
+        console.log('data', data)
+
+        const result = await axios.post(url, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log('File uploaded successfully', result);
+      } catch (error) {
+        console.error('Error uploading file:', JSON.stringify(error, null, 2));
+      }
+    }
+  }
 
   startPlayback = async () => {
     if (this.state.audioPath) {
-      this.setState({isPlaying: true});
+      this.setState({ isPlaying: true });
       const result = await this.audioRecorderPlayer.startPlayer(
         this.state.audioPath,
       );
@@ -87,8 +153,20 @@ class AudioRecorder extends Component<{}, State> {
   stopPlayback = async () => {
     await this.audioRecorderPlayer.stopPlayer();
     this.audioRecorderPlayer.removePlayBackListener();
-    this.setState({isPlaying: false});
+    this.setState({ isPlaying: false });
   };
+
+  async getFirebaseStorageToken(uid: string) {
+    try {
+      const response = await axios.get(
+        `https://us-central1-taskie-38162.cloudfunctions.net/generateToken?uid=${uid}`,
+      );
+      return response.data.token;
+    } catch (error) {
+      console.error('Failed to get token:', error);
+      return null;
+    }
+  }
 }
 
 const styles = StyleSheet.create({
@@ -103,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 1, height: 2},
+    shadowOffset: { width: 1, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 4,
@@ -113,4 +191,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+const readFile = async (path: string, encoding: string): Promise<string> => {
+  return await RNFS.readFile(path, encoding);
+};
 export default AudioRecorder;

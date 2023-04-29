@@ -11,6 +11,7 @@
     "postinstall": "react-native setup-ios-permissions && npx pod-install"
   },
   "dependencies": {
+    "@google-cloud/storage": "^6.9.5",
     "@invertase/react-native-apple-authentication": "^2.2.2",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-firebase/app": "^17.4.3",
@@ -18,9 +19,15 @@
     "@react-native-google-signin/google-signin": "^9.0.2",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
+    "axios": "^1.4.0",
+    "form-data": "^4.0.0",
+    "install": "^0.13.0",
+    "node-fetch": "^3.3.1",
+    "npm": "^9.6.5",
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-audio-recorder-player": "^3.5.3",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.9.0",
     "react-native-permissions": "^3.8.0",
     "react-native-reanimated": "^3.1.0",

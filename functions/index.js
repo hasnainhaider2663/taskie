@@ -5,63 +5,67 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const FormData = require('form-data');
+const { Storage } = require('@google-cloud/storage');
 
 admin.initializeApp();
+const storage = new Storage();
 
-// Trigger the function when a new file is uploaded
 exports.processAudio = functions.storage.object().onFinalize(async object => {
-  // Check if the uploaded file is an audio file
   if (!object.contentType.startsWith('audio/')) {
     console.log('Not an audio file.');
     return;
   }
 
-  // Get the download URL for the file
   const fileBucket = object.bucket;
   const filePath = object.name;
-  const bucket = admin.storage().bucket(fileBucket);
+  const bucket = storage.bucket(fileBucket);
   const file = bucket.file(filePath);
 
-  // Create an access token for the file with an expiration of 1 hour from now
-  const expiresInOneHour = new Date();
-  expiresInOneHour.setHours(expiresInOneHour.getHours() + 1);
+  file.getMetadata()
+    .then(([metadata]) => {
+      const storageStream = file.createReadStream();
 
-  const config = {
-    action: 'read',
-    expires: expiresInOneHour.toISOString(),
-  };
+      const formData = new FormData();
+      formData.append('file', storageStream, {
+        contentType: metadata.contentType,
+        knownLength: metadata.size,
+        filename: filePath,
+      });
+      formData.append('model', 'whisper-1');
 
-  const signedUrl = await file.getSignedUrl(config);
-  const audioUrl = signedUrl[0];
+      const OPENAI_API_URL = 'https://api.openai.com/v1/audio/transcriptions';
+      const OPENAI_API_KEY = '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';
 
-  // Download the audio file to a temporary folder
-  const tempLocalFile = path.join(os.tmpdir(), filePath);
-  await file.download({destination: tempLocalFile});
+      return fetch(OPENAI_API_URL, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          ...formData.getHeaders(),
+        },
+      });
+    })
+    .then(res => res.json())
+    .then(json => console.log('Transcription:', JSON.stringify(json)))
+    .catch(error => console.error('Error:', error));
+});
 
-  // Make a request to OpenAI API
-  const OPENAI_API_URL = 'https://api.openai.com/v1/audio/transcriptions';
-  const OPENAI_API_KEY = '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';
 
-  const form = new FormData();
-  form.append('file', fs.createReadStream(tempLocalFile));
-  form.append('model', 'whisper-1');
+
+exports.generateToken = functions.https.onRequest(async (req, res) => {
+  const uid = req.query.uid;
+
+  if (!uid) {
+    res.status(400).json({ error: 'Missing uid parameter' });
+    return;
+  }
 
   try {
-    const response = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      body: form,
-      headers: {
-        ...form.getHeaders(),
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-    });
-
-    const data = await response.json();
-    console.log('Transcription:', data);
+    const customToken = await admin.auth().createCustomToken(uid);
+    res.json({ token: customToken });
   } catch (error) {
-    console.error('Error:', error);
-  } finally {
-    // Clean up the temporary file
-    fs.unlinkSync(tempLocalFile);
+    console.error('Error:', error)
+    res.status(500).json({ error: 'Failed to generate token' });
   }
 });
