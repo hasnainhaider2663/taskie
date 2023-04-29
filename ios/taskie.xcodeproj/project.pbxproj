@@ -11,9 +11,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		4B4A46E235CD5491220D5485 /* libPods-taskie.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F42743872472CB9B513EE7D8 /* libPods-taskie.a */; };
+		3B8F980F710F11EBD4BCB24A /* libPods-taskie.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD3443E72B949987CCFCB350 /* libPods-taskie.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		CC9DE54D76C883BC2CC62488 /* libPods-taskie-taskieTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A04E813D88CD8670E6DBC6BB /* libPods-taskie-taskieTests.a */; };
+		E36E209170008B1B56AAC061 /* libPods-taskie-taskieTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 743D571167B9C986E2638D51 /* libPods-taskie-taskieTests.a */; };
 		EEB1E68A29FAB351001B2228 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EEB1E68929FAB351001B2228 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -39,13 +39,13 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = taskie/main.m; sourceTree = "<group>"; };
 		2D4986A97A463BCA1DE36859 /* Pods-taskie-taskieTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskie-taskieTests.release.xcconfig"; path = "Target Support Files/Pods-taskie-taskieTests/Pods-taskie-taskieTests.release.xcconfig"; sourceTree = "<group>"; };
 		3644228A437B7642FD2C3AD8 /* Pods-taskie.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskie.debug.xcconfig"; path = "Target Support Files/Pods-taskie/Pods-taskie.debug.xcconfig"; sourceTree = "<group>"; };
+		743D571167B9C986E2638D51 /* libPods-taskie-taskieTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-taskie-taskieTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = taskie/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		A04E813D88CD8670E6DBC6BB /* libPods-taskie-taskieTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-taskie-taskieTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C619481BC4B7B54C840EC62D /* Pods-taskie.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskie.release.xcconfig"; path = "Target Support Files/Pods-taskie/Pods-taskie.release.xcconfig"; sourceTree = "<group>"; };
 		D3E767B60EF3C219A415DCB8 /* Pods-taskie-taskieTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskie-taskieTests.debug.xcconfig"; path = "Target Support Files/Pods-taskie-taskieTests/Pods-taskie-taskieTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EEB1E68929FAB351001B2228 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		F42743872472CB9B513EE7D8 /* libPods-taskie.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-taskie.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD3443E72B949987CCFCB350 /* libPods-taskie.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-taskie.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CC9DE54D76C883BC2CC62488 /* libPods-taskie-taskieTests.a in Frameworks */,
+				E36E209170008B1B56AAC061 /* libPods-taskie-taskieTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B4A46E235CD5491220D5485 /* libPods-taskie.a in Frameworks */,
+				3B8F980F710F11EBD4BCB24A /* libPods-taskie.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,8 +102,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				F42743872472CB9B513EE7D8 /* libPods-taskie.a */,
-				A04E813D88CD8670E6DBC6BB /* libPods-taskie-taskieTests.a */,
+				FD3443E72B949987CCFCB350 /* libPods-taskie.a */,
+				743D571167B9C986E2638D51 /* libPods-taskie-taskieTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

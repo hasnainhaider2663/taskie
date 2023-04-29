@@ -1,28 +1,30 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import React, {Component} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Button} from 'react-native';
 import AudioRecorder from '../components/recorder';
 import auth from '@react-native-firebase/auth';
 
-const HomeScreen = ({ navigation }) => {
+class HomeScreen extends Component<{navigation: any}> {
+  render() {
+    let {navigation} = this.props;
 
+    return (
+      <View style={styles.container}>
+        <Text>{auth().currentUser?.displayName}</Text>
+        <TouchableOpacity style={styles.button}>
+          <AudioRecorder />
+        </TouchableOpacity>
 
-  return (
-    <View style={styles.container}>
-      <Text>{auth().currentUser?.displayName}</Text>
-      <TouchableOpacity style={styles.button} >
-        <AudioRecorder></AudioRecorder>
-      </TouchableOpacity>
-
-      <Button
-        title="Logout"
-        onPress={() => {
-          auth().signOut();
-          navigation.navigate('Login')
-        }}
-      />
-    </View>
-  );
-};
+        <Button
+          title="Logout"
+          onPress={async () => {
+            await auth().signOut();
+            navigation.navigate('Login');
+          }}
+        />
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

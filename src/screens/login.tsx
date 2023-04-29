@@ -1,16 +1,15 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import React, {Component} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
-import { AppleButton } from '@invertase/react-native-apple-authentication';
-import { appleAuth } from '@invertase/react-native-apple-authentication';
+import {AppleButton} from '@invertase/react-native-apple-authentication';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 
 type Props = {
   navigation: any;
 };
 
-class LoginScreen extends React.Component<Props> {
-
+class LoginScreen extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
@@ -21,9 +20,15 @@ class LoginScreen extends React.Component<Props> {
             width: 160,
             height: 45,
           }}
-          onPress={() => this.onAppleButtonPress().then(() => console.log('Apple sign-in complete!'))}
+          onPress={() =>
+            this.onAppleButtonPress().then(() =>
+              console.log('Apple sign-in complete!'),
+            )
+          }
         />
-        <TouchableOpacity style={styles.button} onPress={this.onGoogleButtonPress}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={this.onGoogleButtonPress}>
           <Text style={styles.buttonText}>Sign in with Google</Text>
         </TouchableOpacity>
       </View>
@@ -46,8 +51,11 @@ class LoginScreen extends React.Component<Props> {
     }
 
     // Create a Firebase credential from the response
-    const { identityToken, nonce } = appleAuthRequestResponse;
-    const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
+    const {identityToken, nonce} = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce,
+    );
 
     // Sign the user in with the credential
     return auth().signInWithCredential(appleCredential);
@@ -55,9 +63,9 @@ class LoginScreen extends React.Component<Props> {
 
   async onGoogleButtonPress() {
     // Check if your device supports Google Play
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
     // Get the users ID token
-    const { idToken } = await GoogleSignin.signIn();
+    const {idToken} = await GoogleSignin.signIn();
 
     // Create a Google credential with the token
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -65,7 +73,6 @@ class LoginScreen extends React.Component<Props> {
     // Sign-in the user with the credential
     return auth().signInWithCredential(googleCredential);
   }
-
 }
 
 const styles = StyleSheet.create({
