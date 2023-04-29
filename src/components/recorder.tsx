@@ -10,6 +10,7 @@ type State = {
   isRecording: boolean;
   isPlaying: boolean;
   audioPath: string | null;
+  filename: string,
   user?: any;
 };
 
@@ -23,6 +24,7 @@ class AudioRecorder extends Component<{}, State> {
       isRecording: false,
       isPlaying: false,
       audioPath: null,
+      filename: 'abc.m4a',
     };
     this.audioRecorderPlayer = new AudioRecorderPlayer();
   }
@@ -83,8 +85,11 @@ class AudioRecorder extends Component<{}, State> {
 
   startRecording = async () => {
     this.setState({ isRecording: true });
-    const path = 'audioFile.m4a';
-    const result = await this.audioRecorderPlayer.startRecorder(path);
+    const timestamp = new Date().getTime();
+    const uniqueFilename = `${this.state.user.uid}_audioFile_${timestamp}.m4a`;
+    this.setState({ filename: uniqueFilename })
+    // Set the path for the audio file
+    const result = await this.audioRecorderPlayer.startRecorder(this.state.filename);
     this.audioRecorderPlayer.addRecordBackListener((e: any) => {
       return;
     });
@@ -94,13 +99,13 @@ class AudioRecorder extends Component<{}, State> {
     const result = await this.audioRecorderPlayer.stopRecorder();
     this.audioRecorderPlayer.removeRecordBackListener();
     this.setState({ isRecording: false, audioPath: result }, () => {
-      this.uploadAudio('abc'); // Call the uploadAudio function after updating the state
+      this.uploadAudio(); // Call the uploadAudio function after updating the state
     });
   };
 
-  async uploadAudio(fname: string) {
+  async uploadAudio() {
     if (this.state.audioPath) {
-      const filename = `${fname}.m4a`;
+      const filename = this.state.filename;
       const uid = this.state.user.uid; // Replace with the appropriate user's UID
       const token = await this.getFirebaseStorageToken(uid);
       console.log('token', token)
@@ -110,8 +115,7 @@ class AudioRecorder extends Component<{}, State> {
       }
 
       try {
-        const url = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.projectId
-          }/o}?uploadType=media&name=${encodeURIComponent(filename)}`;
+        const url = `https://firebasestorage.googleapis.com/v0/b/taskie-38162.appspot.com/o?uploadType=media&name=${encodeURIComponent(filename)}`;
         const data = new FormData();
         data.append('file', {
           uri: this.state.audioPath,

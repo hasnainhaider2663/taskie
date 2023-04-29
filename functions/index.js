@@ -47,7 +47,18 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       });
     })
     .then(res => res.json())
-    .then(json => console.log('Transcription:', JSON.stringify(json)))
+    .then(json => {
+      const fileId = path.parse(filePath).name;
+      console.log('Transcription:', JSON.stringify(json))
+
+      // Save the transcript to the "recordings" table in Firestore
+      return db.collection('recordings').doc(fileId).set({
+        transcript: json.transcription
+      });
+
+
+
+    })
     .catch(error => console.error('Error:', error));
 });
 
