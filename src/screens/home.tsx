@@ -1,19 +1,24 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import AudioRecorder from '../components/recorder';
+import auth from '@react-native-firebase/auth';
 
-const HomeScreen = ({navigation}) => {
-  
+const HomeScreen = ({ navigation }) => {
+
 
   return (
     <View style={styles.container}>
-    
+      <Text>{auth().currentUser?.displayName}</Text>
       <TouchableOpacity style={styles.button} >
         <AudioRecorder></AudioRecorder>
       </TouchableOpacity>
+
       <Button
-        title="Go to Login"
-        onPress={() => navigation.navigate('Login')}
+        title="Logout"
+        onPress={() => {
+          auth().signOut();
+          navigation.navigate('Login')
+        }}
       />
     </View>
   );

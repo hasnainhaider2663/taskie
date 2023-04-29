@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Button, View, Text} from 'react-native';
+import {Button, View, Text,TouchableOpacity, StyleSheet} from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+
 type State = {
     isRecording: boolean;
     isPlaying: boolean;
@@ -21,23 +22,32 @@ type State = {
     }
 
     render() {
-        return (
-          <View>
-            <Button
-              title={this.state.isRecording ? 'Stop Recording' : 'Start Recording'}
-              onPress={this.state.isRecording ? this.stopRecording : this.startRecording}
-            />
-            <Button
-              title={this.state.isPlaying ? 'Stop Playback' : 'Start Playback'}
-              onPress={this.state.isPlaying ? this.stopPlayback : this.startPlayback}
-              disabled={!this.state.audioPath}
-            />
-            <Text>
-              {this.state.isRecording ? 'Recording in progress...' : this.state.isPlaying ? 'Playing...' : ''}
+      return (
+        <View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={this.state.isRecording ? this.stopRecording : this.startRecording}
+          >
+            <Text style={styles.buttonText}>
+              {this.state.isRecording ? 'Stop Recording' : 'Start Recording'}
             </Text>
-          </View>
-        );
-      }
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={this.state.isPlaying ? this.stopPlayback : this.startPlayback}
+            disabled={!this.state.audioPath}
+          >
+            <Text style={styles.buttonText}>
+              {this.state.isPlaying ? 'Stop Playback' : 'Start Playback'}
+            </Text>
+          </TouchableOpacity>
+          <Text>
+            {this.state.isRecording ? 'Recording in progress...' : this.state.isPlaying ? 'Playing...' : ''}
+          </Text>
+        </View>
+      );
+    }
+  
     startRecording = async () => {
         this.setState({isRecording: true});
         const path = 'audioFile.m4a';
@@ -75,4 +85,26 @@ type State = {
 
   
   }
+  const styles = StyleSheet.create({
+    button: {
+      backgroundColor: 'red',
+      borderRadius: 50,
+      borderWidth: 2,
+      borderColor: 'black',
+      paddingHorizontal: 30,
+      paddingVertical: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 1, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      elevation: 4,
+    },
+    buttonText: {
+      color: 'white',
+      fontWeight: 'bold',
+    },
+  });
   export default AudioRecorder;
