@@ -5,13 +5,30 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
-import {SafeAreaView, Text, View} from 'react-native';
+import {SafeAreaView} from 'react-native';
 import LoginScreen from './src/screens/login';
 import HomeScreen from './src/screens/home';
 import AuthLoading from './src/screens/authloading';
 import {firebaseConfig} from './FirebaseConfig'; // Import the AuthLoading component
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import OptionsScreen from './src/components/optionsScreen';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+
+class DrawerMenu extends React.Component {
+  render() {
+    return (
+      <Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Options" component={OptionsScreen} />
+        {/* Add other screens to the menu here */}
+      </Drawer.Navigator>
+    );
+  }
+}
+
 class App extends React.Component<
   any,
   {
@@ -21,6 +38,7 @@ class App extends React.Component<
   }
 > {
   unsubscribeAuth!: () => void;
+
   constructor(props: any) {
     super(props);
 
@@ -58,6 +76,7 @@ class App extends React.Component<
       }
     });
   }
+
   componentWillUnmount() {
     this.unsubscribeAuth();
   }
@@ -66,23 +85,27 @@ class App extends React.Component<
     if (this.state.loading) {
       return null; // Show a loading spinner or a placeholder while checking for user authentication
     }
-
+    const insets = this.props.insets;
     return (
-      <SafeAreaView style={{flex: 1}}>
-        <View style={{flex: 1}}>
-          <Text style={{textAlign: 'center', fontSize: 24, color: '#000'}}>
-            Welcome to MyApp
-          </Text>
+      // <SafeAreaProvider>
+      //   <SafeAreaView
+      //     style={{
+      //       flex: 1,
+      //     }}>
           <NavigationContainer>
             <Stack.Navigator initialRouteName="AuthLoading">
               <Stack.Screen name="AuthLoading" component={AuthLoading} />
-              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen
+                name="Drawer"
+                component={DrawerMenu}
+                options={{headerShown: false}}
+              />
               <Stack.Screen name="Login" component={LoginScreen} />
               {/* Add other screens here */}
             </Stack.Navigator>
           </NavigationContainer>
-        </View>
-      </SafeAreaView>
+      //   </SafeAreaView>
+      // </SafeAreaProvider>
     );
   }
 }

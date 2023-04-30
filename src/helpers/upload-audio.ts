@@ -47,6 +47,8 @@ const uploadAudio = async (
       });
 
       console.log('File uploaded successfully !!!!!');
+
+      return result;
     } catch (error) {
       console.error('Error uploading file:', JSON.stringify(error, null, 2));
     }
