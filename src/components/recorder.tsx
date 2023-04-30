@@ -6,14 +6,16 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import { firebaseConfig } from '../../FirebaseConfig';
 import firestore from '@react-native-firebase/firestore';
-
+import getFirebaseStorageToken from '../helpers/get-firebase-token'
+import uploadAudio from '../helpers/upload-audio';
 type State = {
   isRecording: boolean;
   isPlaying: boolean;
-  audioPath: string | null;
+  audioPath: string;
   filename: string,
   user?: any,
-  transcribedText?: string
+  firebasePath?: string,
+  doc?: any
 };
 
 class AudioRecorder extends Component<{}, State> {
@@ -25,8 +27,8 @@ class AudioRecorder extends Component<{}, State> {
     this.state = {
       isRecording: false,
       isPlaying: false,
-      audioPath: null,
-      filename: 'abc.m4a', transcribedText: 'N/A'
+      audioPath: 'abc.m4a',
+      filename: 'abc.m4a'
     };
     this.audioRecorderPlayer = new AudioRecorderPlayer();
   }
@@ -60,7 +62,8 @@ class AudioRecorder extends Component<{}, State> {
               ? 'Playing...'
               : ''}
         </Text>
-        <Text>{this.state.transcribedText}</Text>
+
+        <Text>{this.state.doc?.status} : {this.state.doc?.text}</Text>
       </View>
     );
   }
@@ -89,19 +92,27 @@ class AudioRecorder extends Component<{}, State> {
   startRecording = async () => {
     this.setState({ isRecording: true });
     const timestamp = new Date().getTime();
-    const uniqueFilename = `${this.state.user.uid}_audioFile_${timestamp}.m4a`;
-    this.setState({ filename: uniqueFilename })
-    firestore()
-      .collection('recordings')
-      .doc(this.state.filename)
-      .get()
-      .then(documentSnapshot => {
-        console.log('User exists: ', documentSnapshot.exists);
+    const firebasePath = `${this.state.user.uid}_audioFile_${timestamp}`;
+    const uniqueFilename = firebasePath + '.m4a';
+    this.setState({ filename: uniqueFilename, firebasePath })
 
-        if (documentSnapshot.exists) {
-          console.log('User data: ', documentSnapshot.data());
-        }
-      });
+    console.log('document id for recording', uniqueFilename)
+    const fireStoreCollection = firestore()
+      .collection('users').doc(this.state.user.uid)
+      .collection('recordings');
+    const firestoreDoc = fireStoreCollection.doc(firebasePath);
+    firestoreDoc.set({ id: firebasePath, status: 'loading' })
+    firestoreDoc.onSnapshot(documentSnapshot => {
+      console.log('doc exists: ', documentSnapshot.exists);
+
+      if (documentSnapshot.exists) {
+        const data = documentSnapshot.data();
+        this.setState({ doc: data })
+        console.log('doc data: ', data);
+      }
+    });
+
+
     // Set the path for the audio file
     const result = await this.audioRecorderPlayer.startRecorder(this.state.filename);
     this.audioRecorderPlayer.addRecordBackListener((e: any) => {
@@ -113,45 +124,11 @@ class AudioRecorder extends Component<{}, State> {
     const result = await this.audioRecorderPlayer.stopRecorder();
     this.audioRecorderPlayer.removeRecordBackListener();
     this.setState({ isRecording: false, audioPath: result }, () => {
-      this.uploadAudio(); // Call the uploadAudio function after updating the state
+      uploadAudio(this.state.audioPath, this.state.filename, this.state.user.uid); // Call the uploadAudio function after updating the state
     });
   };
 
-  async uploadAudio() {
-    if (this.state.audioPath) {
-      const filename = this.state.filename;
-      const uid = this.state.user.uid; // Replace with the appropriate user's UID
-      const token = await this.getFirebaseStorageToken(uid);
-      console.log('token', token)
-      if (!token) {
-        console.error('Failed to get Firebase Storage token');
-        return;
-      }
 
-      try {
-        const url = `https://firebasestorage.googleapis.com/v0/b/taskie-38162.appspot.com/o?uploadType=media&name=${encodeURIComponent(filename)}`;
-        const data = new FormData();
-        data.append('file', {
-          uri: this.state.audioPath,
-          type: 'audio/m4a',
-          name: filename,
-        });
-        console.log('url', url)
-        console.log('data', data)
-
-        const result = await axios.post(url, data, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        console.log('File uploaded successfully', result);
-      } catch (error) {
-        console.error('Error uploading file:', JSON.stringify(error, null, 2));
-      }
-    }
-  }
 
   startPlayback = async () => {
     if (this.state.audioPath) {
@@ -174,17 +151,7 @@ class AudioRecorder extends Component<{}, State> {
     this.setState({ isPlaying: false });
   };
 
-  async getFirebaseStorageToken(uid: string) {
-    try {
-      const response = await axios.get(
-        `https://us-central1-taskie-38162.cloudfunctions.net/generateToken?uid=${uid}`,
-      );
-      return response.data.token;
-    } catch (error) {
-      console.error('Failed to get token:', error);
-      return null;
-    }
-  }
+
 }
 
 const styles = StyleSheet.create({
