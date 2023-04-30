@@ -5,13 +5,15 @@ import RNFS from 'react-native-fs';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import { firebaseConfig } from '../../FirebaseConfig';
+import firestore from '@react-native-firebase/firestore';
 
 type State = {
   isRecording: boolean;
   isPlaying: boolean;
   audioPath: string | null;
   filename: string,
-  user?: any;
+  user?: any,
+  transcribedText?: string
 };
 
 class AudioRecorder extends Component<{}, State> {
@@ -24,7 +26,7 @@ class AudioRecorder extends Component<{}, State> {
       isRecording: false,
       isPlaying: false,
       audioPath: null,
-      filename: 'abc.m4a',
+      filename: 'abc.m4a', transcribedText: 'N/A'
     };
     this.audioRecorderPlayer = new AudioRecorderPlayer();
   }
@@ -58,6 +60,7 @@ class AudioRecorder extends Component<{}, State> {
               ? 'Playing...'
               : ''}
         </Text>
+        <Text>{this.state.transcribedText}</Text>
       </View>
     );
   }
@@ -88,6 +91,17 @@ class AudioRecorder extends Component<{}, State> {
     const timestamp = new Date().getTime();
     const uniqueFilename = `${this.state.user.uid}_audioFile_${timestamp}.m4a`;
     this.setState({ filename: uniqueFilename })
+    firestore()
+      .collection('recordings')
+      .doc(this.state.filename)
+      .get()
+      .then(documentSnapshot => {
+        console.log('User exists: ', documentSnapshot.exists);
+
+        if (documentSnapshot.exists) {
+          console.log('User data: ', documentSnapshot.data());
+        }
+      });
     // Set the path for the audio file
     const result = await this.audioRecorderPlayer.startRecorder(this.state.filename);
     this.audioRecorderPlayer.addRecordBackListener((e: any) => {
