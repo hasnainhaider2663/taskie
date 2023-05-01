@@ -13,7 +13,7 @@ const uploadAudio = async (
       console.error('Failed to get Firebase Storage token');
       return;
     }
-    const target=`${uid}/recordings/${filename}`
+    const target = `${uid}/recordings/${filename}`
 
     try {
       const url = `https://firebasestorage.googleapis.com/v0/b/taskie-38162.appspot.com/o?uploadType=media&name=${encodeURIComponent(

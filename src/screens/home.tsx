@@ -1,18 +1,18 @@
-import React, {Component} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
+import React, { Component } from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import AudioRecorder from '../components/recorder';
 import RecordingsList from '../components/recordings-list';
 import Modal from 'react-native-modal';
 
-class HomeScreen extends Component<{navigation: any}> {
+class HomeScreen extends Component<{ navigation: any }> {
   state = {
     isModalVisible: false,
   };
 
   toggleModal = () => {
-    this.setState({isModalVisible: !this.state.isModalVisible});
+    this.setState({ isModalVisible: !this.state.isModalVisible });
   };
 
   render() {
@@ -33,7 +33,7 @@ class HomeScreen extends Component<{navigation: any}> {
           propagateSwipe
           style={styles.modal}>
           <View style={styles.modalContent}>
-          <AudioRecorder />
+            <AudioRecorder />
           </View>
         </Modal>
       </View>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     paddingTop: 20,
-    height:'90%',
+    height: '90%',
   },
 });
 
