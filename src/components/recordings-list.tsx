@@ -40,7 +40,7 @@ class RecordingsList extends Component<{}, State> {
   renderItem = ({item}: {item: any}) => {
     return (
       <View style={styles.listItem}>
-        <Text>{item.text}</Text>
+        <Text>{item.title}</Text>
       </View>
     );
   };

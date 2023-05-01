@@ -49,8 +49,8 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
     };
     const res = await fetch(OPENAI_API_URL, fetchOptions);
     const json = await res.json();
-    const userUid = filePath.split('_')[0];
-    const fileId = path.parse(filePath).name;
+    const fileId = path.parse(filePath).name.split('/')[path.parse(filePath).name.split('/').length-1];
+    const userUid = fileId.split('_')[0];
     console.log('Transcription:', JSON.stringify(json));
     console.log('fileId:', fileId);
     console.log('user', userUid)
@@ -63,6 +63,7 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       .doc(fileId)
       .update({
         text: json.text,
+        title:json.text.substring(0,30),
         status: 'done',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
