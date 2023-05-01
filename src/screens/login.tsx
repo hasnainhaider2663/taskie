@@ -6,7 +6,7 @@ import {AppleButton} from '@invertase/react-native-apple-authentication';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 
 type Props = {
-  navigation: any;
+  navigation?: any;
 };
 
 class LoginScreen extends Component<Props> {

@@ -44,7 +44,7 @@ class AudioRecorder extends Component<{}, State> {
       isPlaying: false,
       audioPath: 'abc.m4a',
       filename: 'abc.m4a',
-      doc: {text: 'Hello and welcome to Taskie!'},
+      doc: {text: `Hello!`},
       scale: new Animated.Value(1),
     };
     this.audioRecorderPlayer = new AudioRecorderPlayer();
@@ -129,7 +129,7 @@ class AudioRecorder extends Component<{}, State> {
       console.log('auth state changed');
 
       if (user) {
-        this.setState({user});
+        this.setState({user, doc: {text: `Hello ${user.displayName?.split(' ')[0]}! \n Tap the mic to start speaking and talk to me about your tasks or just record notes`}});
 
         // this.props.navigation.navigate('Home')
       } else {

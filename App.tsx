@@ -5,28 +5,24 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
-import {SafeAreaView} from 'react-native';
 import LoginScreen from './src/screens/login';
 import HomeScreen from './src/screens/home';
-import AuthLoading from './src/screens/authloading';
 import {firebaseConfig} from './FirebaseConfig'; // Import the AuthLoading component
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import OptionsScreen from './src/components/optionsScreen';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
 
-class DrawerMenu extends React.Component {
-  render() {
-    return (
-      <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Options" component={OptionsScreen} />
-        {/* Add other screens to the menu here */}
-      </Drawer.Navigator>
-    );
-  }
+
+function TabMenu() {
+  return (
+    <Tab.Navigator initialRouteName="Home">
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Options" component={OptionsScreen} />
+      {/* Add other screens to the menu here */}
+    </Tab.Navigator>
+  );
 }
 
 class App extends React.Component<
@@ -64,7 +60,7 @@ class App extends React.Component<
     // Check if user is logged in
     this.unsubscribeAuth = auth().onAuthStateChanged(user => {
       console.log('----');
-      console.log('auth state changed');
+      console.log('auth state changed',user);
 
       if (user) {
         this.setState({initialRoute: 'Home', loading: false, user});
@@ -85,27 +81,10 @@ class App extends React.Component<
     if (this.state.loading) {
       return null; // Show a loading spinner or a placeholder while checking for user authentication
     }
-    const insets = this.props.insets;
     return (
-      // <SafeAreaProvider>
-      //   <SafeAreaView
-      //     style={{
-      //       flex: 1,
-      //     }}>
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName="AuthLoading">
-              <Stack.Screen name="AuthLoading" component={AuthLoading} />
-              <Stack.Screen
-                name="Drawer"
-                component={DrawerMenu}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen name="Login" component={LoginScreen} />
-              {/* Add other screens here */}
-            </Stack.Navigator>
-          </NavigationContainer>
-      //   </SafeAreaView>
-      // </SafeAreaProvider>
+      <NavigationContainer>
+        {!this.state.user ? <LoginScreen /> : <TabMenu />}
+      </NavigationContainer>
     );
   }
 }
