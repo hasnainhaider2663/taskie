@@ -83,7 +83,7 @@ class AudioRecorder extends Component<{}, State> {
       <View style={styles.container}>
         <View style={styles.mainContainer}>
           <Text style={styles.docText}>{this.state.doc?.text}</Text>
-          {this.state.doc.status === 'done' && (
+          {this.state.doc.status === 'done' ? (
             <View style={styles.playbackContainer}>
               <TouchableOpacity
                 style={[
@@ -101,7 +101,7 @@ class AudioRecorder extends Component<{}, State> {
                 )}
               </TouchableOpacity>
             </View>
-          )}
+          ) : null}
         </View>
         <View style={styles.outerButtonContainer}>
           <View style={styles.buttonContainer}>
@@ -129,7 +129,14 @@ class AudioRecorder extends Component<{}, State> {
       console.log('auth state changed');
 
       if (user) {
-        this.setState({user, doc: {text: `Hello ${user.displayName?.split(' ')[0]}! \n Tap the mic to start speaking and talk to me about your tasks or just record notes`}});
+        this.setState({
+          user,
+          doc: {
+            text: `Hello ${
+              user.displayName?.split(' ')[0]
+            }! \n Tap the mic to start speaking and talk to me about your tasks or just record notes`,
+          },
+        });
 
         // this.props.navigation.navigate('Home')
       } else {
@@ -231,7 +238,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#ffffff',
     width: '100%',
   },
   outerButtonContainer: {
