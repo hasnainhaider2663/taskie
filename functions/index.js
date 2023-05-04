@@ -78,7 +78,7 @@ exports.generateToken = functions.https.onRequest(async (req, res) => {
   const uid = req.query.uid;
 
   if (!uid) {
-    res.status(400).json({ error: 'Missing uid parameter' });
+    res.status(400).json({ error: 'Missing uid parameter.' });
     return;
   }
 
