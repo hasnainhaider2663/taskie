@@ -5,22 +5,22 @@ import firestore from '@react-native-firebase/firestore';
 import { TouchableOpacity } from 'react-native';
 
 interface State {
-  recordings: any[],
+  entries: any[],
   user?: any,
 
 }
 
-class RecordingsList extends Component<any, State> {
+class EntriesList extends Component<any, State> {
   unsubscribeFirestore: any;
   userSub: any;
   constructor(props: any) {
     super(props);
     this.state = {
-      recordings: [],
+      entries: [],
     };
   }
-  handleNavigateToDetails = (recordingId: string) => {
-    this.props.navigation.navigate('Details', { recordingId });
+  handleNavigateToDetails = (entryId: string) => {
+    this.props.navigation.navigate('Details', { entryId });
   };
   componentDidMount() {
     this.userSub = auth().onAuthStateChanged(user => {
@@ -31,11 +31,11 @@ class RecordingsList extends Component<any, State> {
       this.unsubscribeFirestore = firestore()
         .collection('users')
         .doc(user.uid)
-        .collection('recordings')
+        .collection('entries')
         .onSnapshot(querySnapshot => {
-          const recordings = querySnapshot.docs.map(doc => doc.data());
-          console.log('recordings', recordings)
-          this.setState({ recordings });
+          const entries = querySnapshot.docs.map(doc => doc.data());
+          console.log('entries', entries)
+          this.setState({ entries });
         });
     }
   }
@@ -60,7 +60,7 @@ class RecordingsList extends Component<any, State> {
 
     const handleDelete = async () => {
       // Implement delete functionality here
-      await firestore().collection('users').doc(this.state.user.uid).collection('recordings').doc(item.id).delete()
+      await firestore().collection('users').doc(this.state.user.uid).collection('entries').doc(item.id).delete()
 
     };
 
@@ -85,7 +85,7 @@ class RecordingsList extends Component<any, State> {
     return (
       <View style={styles.container}>
         {this.state.user ? <FlatList
-          data={this.state.recordings}
+          data={this.state.entries}
           renderItem={this.renderItem}
           keyExtractor={(item, index) => index.toString()}
         /> : null}
@@ -123,4 +123,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default RecordingsList;
+export default EntriesList;

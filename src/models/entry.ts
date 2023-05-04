@@ -1,8 +1,8 @@
-export interface Recording {
+export interface Entry {
     id: string;
     createdAt: string;
     status: 'done' | 'loading' | 'error'
-    text: string
+    blocks: [];
     title: string
 
 

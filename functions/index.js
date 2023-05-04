@@ -49,21 +49,21 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
     };
     const res = await fetch(OPENAI_API_URL, fetchOptions);
     const json = await res.json();
-    const fileId = path.parse(filePath).name.split('/')[path.parse(filePath).name.split('/').length-1];
+    const fileId = path.parse(filePath).name.split('/')[path.parse(filePath).name.split('/').length - 1];
     const userUid = fileId.split('_')[0];
     console.log('Transcription:', JSON.stringify(json));
     console.log('fileId:', fileId);
     console.log('user', userUid)
 
-    // Save the transcript to the "recordings" table in Firestore
+    // Save the transcript to the "entries" table in Firestore
     await db
       .collection('users')
       .doc(userUid)
-      .collection('recordings')
+      .collection('entries')
       .doc(fileId)
       .update({
-        text: json.text,
-        title:json.text.substring(0,30),
+        title: json.text.substring(0, 30),
+        blocks: [{ type: 'TextBlock', block: { text: json.text } }],
         status: 'done',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
@@ -104,8 +104,8 @@ exports.createNewUserDocument = functions.auth.user().onCreate(async (user) => {
 
 
 
-    console.log(`User document and recordings subcollection created for user with UID: ${user.uid}`);
+    console.log(`User document and entries subcollection created for user with UID: ${user.uid}`);
   } catch (error) {
-    console.error(`Error creating user document and recordings subcollection: ${error}`);
+    console.error(`Error creating user document and entries subcollection: ${error}`);
   }
 });

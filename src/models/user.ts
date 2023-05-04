@@ -1,9 +1,9 @@
-import { Recording } from "./recording";
+import { Entry } from "./entry";
 
 export interface User {
     uid: string;
     displayName: string;
     createdAt: Date;
     email: string;
-    recordings: Recording[]
+    entries: Entry[]
 }

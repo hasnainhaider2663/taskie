@@ -17,14 +17,14 @@ const Stack = createStackNavigator();
 
 function TabMenu() {
   return (
-    <Tab.Navigator initialRouteName="Home">
-      <Tab.Screen name="HomeWrapper" component={HomeWrapper} />
+    <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="Entries" component={HomeWrapper} />
       <Tab.Screen name="Options" component={OptionsScreen} />
     </Tab.Navigator >
   );
 }
 function HomeWrapper() {
-  return (<Stack.Navigator screenOptions={{ headerShown: false }}>
+  return (<Stack.Navigator screenOptions={{ headerShown: true }}>
 
     <Tab.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="Details" component={Details} />
@@ -77,7 +77,7 @@ class App extends React.Component<
       return null; // Show a loading spinner or a placeholder while checking for user authentication
     }
     return (
-      <NavigationContainer>
+      <NavigationContainer >
         {!this.state.user ? <LoginScreen /> : <TabMenu />}
       </NavigationContainer>
     );

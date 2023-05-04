@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
@@ -21,7 +21,7 @@ import firestore from '@react-native-firebase/firestore';
 import uploadAudio from '../helpers/upload-audio';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 type State = {
   isRecording: boolean;
   isPlaying: boolean;
@@ -44,7 +44,7 @@ class AudioRecorder extends Component<{}, State> {
       isPlaying: false,
       audioPath: 'abc.m4a',
       filename: 'abc.m4a',
-      doc: {text: `Hello!`},
+      doc: { blocks: [{ block: { text: `Hello!` } }] },
       scale: new Animated.Value(1),
     };
     this.audioRecorderPlayer = new AudioRecorderPlayer();
@@ -77,12 +77,12 @@ class AudioRecorder extends Component<{}, State> {
     const iconSize = buttonSize * 0.5;
 
     const animatedStyle = {
-      transform: [{scale: this.state.scale}],
+      transform: [{ scale: this.state.scale }],
     };
     return (
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-          <Text style={styles.docText}>{this.state.doc?.text}</Text>
+          <Text style={styles.docText}>{this.state.doc?.blocks[0].block.text}</Text>
           {this.state.doc.status === 'done' ? (
             <View style={styles.playbackContainer}>
               <TouchableOpacity
@@ -107,7 +107,7 @@ class AudioRecorder extends Component<{}, State> {
           <View style={styles.buttonContainer}>
             <Animated.View style={[styles.buttonShadow, animatedStyle]}>
               <TouchableOpacity
-                style={[styles.button, {width: buttonSize, height: buttonSize}]}
+                style={[styles.button, { width: buttonSize, height: buttonSize }]}
                 onPress={this.handleRecordPress}>
                 <Icon
                   name={this.state.isRecording ? 'stop' : 'mic'}
@@ -132,15 +132,19 @@ class AudioRecorder extends Component<{}, State> {
         this.setState({
           user,
           doc: {
-            text: `Hello ${
-              user.displayName?.split(' ')[0]
-            }! \n Tap the mic to start speaking and talk to me about your tasks or just record notes`,
-          },
+            blocks: [
+              {
+                block: {
+                  text: `Hello ${user.displayName?.split(' ')[0]}! \n Tap the mic to start speaking and talk to me about your tasks or just record notes`,
+                }
+              }
+            ],
+          }
         });
 
         // this.props.navigation.navigate('Home')
       } else {
-        this.setState({user});
+        this.setState({ user });
         // this.props.navigation.navigate('Login')
       }
     });
@@ -151,26 +155,27 @@ class AudioRecorder extends Component<{}, State> {
   }
 
   startRecording = async () => {
-    this.setState({isRecording: true});
+    this.setState({ isRecording: true });
     const timestamp = new Date().getTime();
     const firebasePath = `${this.state.user.uid}_audioFile_${timestamp}`;
     const uniqueFilename = firebasePath + '.m4a';
-    this.setState({filename: uniqueFilename, firebasePath});
+    this.setState({ filename: uniqueFilename, firebasePath });
 
     const fireStoreCollection = firestore()
       .collection('users')
       .doc(this.state.user.uid)
-      .collection('recordings');
+      .collection('entries');
     const firestoreDoc = fireStoreCollection.doc(firebasePath);
     await firestoreDoc.set({
       id: firebasePath,
       status: 'loading',
-      text: 'listening...',
+      blocks: [{ block: { text: 'listening...' }, type: 'text' }]
     });
     firestoreDoc.onSnapshot(documentSnapshot => {
       if (documentSnapshot.exists) {
         const data = documentSnapshot.data();
-        this.setState({doc: data});
+        console.log(data)
+        this.setState({ doc: data });
       }
     });
     const audioSet: AudioSet = {
@@ -197,23 +202,26 @@ class AudioRecorder extends Component<{}, State> {
     const fireStoreCollection = firestore()
       .collection('users')
       .doc(this.state.user.uid)
-      .collection('recordings');
+      .collection('entries');
     const firestoreDoc = fireStoreCollection.doc(this.state.firebasePath);
-    await firestoreDoc.update({text: 'Uploading...'});
-    this.setState({isRecording: false, audioPath: result}, async () => {
+    await firestoreDoc.update({
+      blocks: [{ block: { text: 'Loading...' }, type: 'text' }]
+    });
+    this.setState({ isRecording: false, audioPath: result }, async () => {
       await uploadAudio(
         this.state.audioPath,
         this.state.filename,
         this.state.user.uid,
       ); // Call the uploadAudio function after updating the state
 
-      await firestoreDoc.update({text: 'Thinking about what you said...'});
+
+      await firestoreDoc.update({ blocks: [{ block: { text: 'Thinking about what you said...' }, type: 'text' }] });
     });
   };
 
   startPlayback = async () => {
     if (this.state.audioPath) {
-      this.setState({isPlaying: true});
+      this.setState({ isPlaying: true });
       const result = await this.audioRecorderPlayer.startPlayer(
         this.state.audioPath,
       );
@@ -229,7 +237,7 @@ class AudioRecorder extends Component<{}, State> {
   stopPlayback = async () => {
     await this.audioRecorderPlayer.stopPlayer();
     this.audioRecorderPlayer.removePlayBackListener();
-    this.setState({isPlaying: false});
+    this.setState({ isPlaying: false });
   };
 }
 
@@ -261,7 +269,7 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     backgroundColor: '#FF3B30',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 5},
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
@@ -280,7 +288,7 @@ const styles = StyleSheet.create({
     borderRadius: 50, // set the radius to half the button size
     width: 'auto',
     shadowColor: '#eee',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 1,
@@ -291,7 +299,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 50, // set the radius to half the button size
     shadowColor: '#eee',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 1,
@@ -321,7 +329,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 30,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,

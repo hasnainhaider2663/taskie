@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import AudioRecorder from '../components/recorder';
-import RecordingsList from '../components/recordings-list';
+import EntriesList from '../components/entries-list';
 import Modal from 'react-native-modal';
 
 class HomeScreen extends Component<{ navigation: any }> {
@@ -18,7 +18,7 @@ class HomeScreen extends Component<{ navigation: any }> {
   render() {
     return (
       <View style={styles.container}>
-        <RecordingsList {...this.props} />
+        <EntriesList {...this.props} />
         <TouchableOpacity
           style={styles.recordButton}
           onPress={this.toggleModal}>
