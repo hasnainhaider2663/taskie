@@ -7,18 +7,21 @@ import { TouchableOpacity } from 'react-native';
 interface State {
   recordings: any[],
   user?: any,
+
 }
 
-class RecordingsList extends Component<{}, State> {
+class RecordingsList extends Component<any, State> {
   unsubscribeFirestore: any;
   userSub: any;
-  constructor(props: {}) {
+  constructor(props: any) {
     super(props);
     this.state = {
       recordings: [],
     };
   }
-
+  handleNavigateToDetails = (recordingId: string) => {
+    this.props.navigation.navigate('Details', { recordingId });
+  };
   componentDidMount() {
     this.userSub = auth().onAuthStateChanged(user => {
       this.setState({ user })
@@ -62,7 +65,7 @@ class RecordingsList extends Component<{}, State> {
     };
 
     return (
-      <View style={styles.listItem}>
+      <TouchableOpacity style={styles.listItem} onPress={() => this.handleNavigateToDetails(item.id)}>
         <Text>{item.title}..</Text>
         <View style={styles.buttonContainer}>
 
@@ -73,7 +76,7 @@ class RecordingsList extends Component<{}, State> {
             <Text style={styles.buttonText}>Delete</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
   render() {

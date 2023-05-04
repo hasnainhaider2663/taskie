@@ -18,7 +18,7 @@ class HomeScreen extends Component<{ navigation: any }> {
   render() {
     return (
       <View style={styles.container}>
-        <RecordingsList />
+        <RecordingsList {...this.props} />
         <TouchableOpacity
           style={styles.recordButton}
           onPress={this.toggleModal}>
