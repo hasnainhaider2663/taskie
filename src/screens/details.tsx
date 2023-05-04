@@ -1,9 +1,11 @@
 // Details.tsx
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Button } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { TextBlock, AudioBlock, ImageBlock, VideoBlock, CheckListBlock, ChechListItem, Block, BlockType } from '../models/blocks';
+import BackButton from '../components/back-button';
+import Controls from '../components/controls';
 
 type Props = {
     route: {
@@ -33,14 +35,8 @@ class Details extends Component<Props, State> {
     componentDidMount(): void {
 
         this.unsubscribeAuth = auth().onAuthStateChanged(user => {
-            console.log('----');
-            console.log('auth state changed');
-
-
             this.setState({ user });
-
             this.fetchEntry();
-
         });
     }
 
@@ -84,10 +80,12 @@ class Details extends Component<Props, State> {
 
         return (
             <View style={styles.container}>
-                <Text style={styles.title} >{entry.title}</Text>
+                <BackButton />
+                <Text style={styles.title}>{entry.title}</Text>
                 {entry.blocks?.map((block: Block, index: number) => (
                     <React.Fragment key={index}>{renderBlock(block)}</React.Fragment>
                 ))}
+                <Controls />
             </View>
         );
     }
@@ -140,15 +138,14 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         // backgroundColor: '#F5FCFF',
-        backgroundColor: '#FFF',
 
     },
     blockContainer: {},
     image: {},
     title: {
+        paddingVertical: 30,
         fontSize: 60,
-        maxWidth: '80%',
-        fontWeight: 900,
+        fontWeight: 500,
 
 
     },

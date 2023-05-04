@@ -11,20 +11,21 @@ import OptionsScreen from './src/components/optionsScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Details from './src/screens/details';
+import { View, StyleSheet } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function TabMenu() {
   return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+    <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }} >
       <Tab.Screen name="Entries" component={HomeWrapper} />
       <Tab.Screen name="Options" component={OptionsScreen} />
     </Tab.Navigator >
   );
 }
 function HomeWrapper() {
-  return (<Stack.Navigator screenOptions={{ headerShown: true }}>
+  return (<Stack.Navigator screenOptions={{ headerShown: false }}>
 
     <Tab.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="Details" component={Details} />
@@ -77,11 +78,19 @@ class App extends React.Component<
       return null; // Show a loading spinner or a placeholder while checking for user authentication
     }
     return (
-      <NavigationContainer >
-        {!this.state.user ? <LoginScreen /> : <TabMenu />}
-      </NavigationContainer>
+      <View style={styles.container}>
+        <NavigationContainer >
+          {!this.state.user ? <LoginScreen /> : <TabMenu />}
+        </NavigationContainer>
+      </View>
     );
   }
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
 
 export default App;
