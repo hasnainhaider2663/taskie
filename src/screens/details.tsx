@@ -139,13 +139,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F5FCFF',
+        // backgroundColor: '#F5FCFF',
+        backgroundColor: '#FFF',
+
     },
     blockContainer: {},
     image: {},
     title: {
         fontSize: 60,
-        fontWeight: 'bold'
+        maxWidth: '80%',
+        fontWeight: 900,
+
 
     },
     text: {
