@@ -55,6 +55,7 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
     console.log('fileId:', fileId);
     console.log('user', userUid)
 
+    const splitText=json.text.split(' ')
     // Save the transcript to the "entries" table in Firestore
     await db
       .collection('users')
@@ -62,7 +63,7 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       .collection('entries')
       .doc(fileId)
       .update({
-        title: json.text.substring(0, 30),
+        title: splitText[0]+' '+(splitText[1]?splitText[1]:'')+' '+(splitText[2] ? splitText[2] : ""),
         blocks: [{ type: 'TextBlock', block: { text: json.text } }],
         status: 'done',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),

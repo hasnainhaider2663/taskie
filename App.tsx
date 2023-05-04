@@ -1,35 +1,36 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import {NavigationContainer} from '@react-navigation/native';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 import LoginScreen from './src/screens/login';
 import HomeScreen from './src/screens/home';
-import { firebaseConfig } from './FirebaseConfig'; // Import the AuthLoading component
+import {firebaseConfig} from './FirebaseConfig'; // Import the AuthLoading component
 import OptionsScreen from './src/components/optionsScreen';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
 import Details from './src/screens/details';
-import { View, StyleSheet } from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function TabMenu() {
   return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }} >
+    <Tab.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
       <Tab.Screen name="Entries" component={HomeWrapper} />
       <Tab.Screen name="Options" component={OptionsScreen} />
-    </Tab.Navigator >
+    </Tab.Navigator>
   );
 }
 function HomeWrapper() {
-  return (<Stack.Navigator screenOptions={{ headerShown: false }}>
-
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Stack.Screen name="Details" component={Details} />
-  </Stack.Navigator >)
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={Details} />
+    </Stack.Navigator>
+  );
 }
 
 class App extends React.Component<
@@ -65,7 +66,7 @@ class App extends React.Component<
     this.unsubscribeAuth = auth().onAuthStateChanged(user => {
       console.log('----');
       console.log('auth state changed', user);
-      this.setState({ loading: false, user });
+      this.setState({loading: false, user});
     });
   }
 
@@ -79,7 +80,7 @@ class App extends React.Component<
     }
     return (
       <View style={styles.container}>
-        <NavigationContainer >
+        <NavigationContainer>
           {!this.state.user ? <LoginScreen /> : <TabMenu />}
         </NavigationContainer>
       </View>

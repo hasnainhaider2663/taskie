@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   recordButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
     width: 70,
@@ -62,7 +62,6 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   modalContent: {
-    backgroundColor: 'white',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     paddingTop: 20,

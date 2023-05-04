@@ -6,6 +6,7 @@ import auth from '@react-native-firebase/auth';
 import { TextBlock, AudioBlock, ImageBlock, VideoBlock, CheckListBlock, ChechListItem, Block, BlockType } from '../models/blocks';
 import BackButton from '../components/back-button';
 import Controls from '../components/controls';
+import EditTextControls from "../components/edit-text-controls";
 
 type Props = {
     route: {
@@ -32,11 +33,35 @@ class Details extends Component<Props, State> {
         };
     }
 
+
+    render() {
+        const { isLoading, entry } = this.state;
+
+        if (isLoading) {
+            return (
+                <View style={styles.container}>
+                    <Text>Loading...</Text>
+                </View>
+            );
+        }
+
+        return (
+            <View style={styles.container}>
+                <BackButton />
+                <Text style={styles.title}>{entry.title}</Text>
+                {entry.blocks?.map((block: Block, index: number) => (
+                    <React.Fragment key={index}>{renderBlock(block)}</React.Fragment>
+                ))}
+                <EditTextControls />
+            </View>
+        );
+    }
+
     componentDidMount(): void {
 
-        this.unsubscribeAuth = auth().onAuthStateChanged(user => {
+        this.unsubscribeAuth = auth().onAuthStateChanged(async user => {
             this.setState({ user });
-            this.fetchEntry();
+            await this.fetchEntry();
         });
     }
 
@@ -65,29 +90,6 @@ class Details extends Component<Props, State> {
             console.error(error);
             this.setState({ isLoading: false });
         }
-    }
-
-    render() {
-        const { isLoading, entry } = this.state;
-
-        if (isLoading) {
-            return (
-                <View style={styles.container}>
-                    <Text>Loading...</Text>
-                </View>
-            );
-        }
-
-        return (
-            <View style={styles.container}>
-                <BackButton />
-                <Text style={styles.title}>{entry.title}</Text>
-                {entry.blocks?.map((block: Block, index: number) => (
-                    <React.Fragment key={index}>{renderBlock(block)}</React.Fragment>
-                ))}
-                <Controls />
-            </View>
-        );
     }
 }
 const renderBlock = (blockItem: Block) => {

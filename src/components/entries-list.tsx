@@ -54,28 +54,12 @@ class EntriesList extends Component<any, State> {
       // Implement play functionality here
     };
 
-    const handleEdit = async () => {
-      // Implement edit functionality here
-    };
 
-    const handleDelete = async () => {
-      // Implement delete functionality here
-      await firestore().collection('users').doc(this.state.user.uid).collection('entries').doc(item.id).delete()
-
-    };
 
     return (
       <TouchableOpacity style={styles.listItem} onPress={() => this.handleNavigateToDetails(item.id)}>
         <Text>{item.title}..</Text>
-        <View style={styles.buttonContainer}>
 
-          <TouchableOpacity onPress={handleEdit} style={styles.button}>
-            <Text style={styles.buttonText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete} style={styles.button}>
-            <Text style={styles.buttonText}>Delete</Text>
-          </TouchableOpacity>
-        </View>
       </TouchableOpacity>
     );
   };
@@ -107,19 +91,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-  },
-  button: {
-    backgroundColor: '#2196F3',
-    padding: 10,
-    borderRadius: 4,
-    marginLeft: 5,
-  },
-  buttonText: {
-    color: '#fff',
-  },
+  }
 
 });
 
