@@ -71,7 +71,16 @@ class AudioRecorder extends Component<{}, State> {
     } else {
       await this.startRecording();
     }
-  };
+  }
+  handleRecordPressIn = async () => {
+    this.animateScale();
+    await this.startRecording();
+  }
+
+  handleRecordPressOut = async () => {
+    this.animateScale();
+    await this.stopRecording();
+  }
   render() {
     const buttonSize = width * 0.25;
     const iconSize = buttonSize * 0.5;
@@ -108,7 +117,8 @@ class AudioRecorder extends Component<{}, State> {
             <Animated.View style={[styles.buttonShadow, animatedStyle]}>
               <TouchableOpacity
                 style={[styles.button, { width: buttonSize, height: buttonSize }]}
-                onPress={this.handleRecordPress}>
+                onPressIn={this.handleRecordPressIn}
+                onPressOut={this.handleRecordPressOut}>
                 <Icon
                   name={this.state.isRecording ? 'stop' : 'mic'}
                   size={iconSize}

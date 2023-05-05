@@ -3,10 +3,10 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import AudioRecorder from '../components/recorder';
-import EntriesList from '../components/entries-list';
+import NotesListComponent from '../components/notes-list-component';
 import Modal from 'react-native-modal';
 
-class HomeScreen extends Component<{ navigation: any }> {
+class TasksListScreen extends Component<{ navigation: any }> {
   state = {
     isModalVisible: false,
   };
@@ -18,7 +18,7 @@ class HomeScreen extends Component<{ navigation: any }> {
   render() {
     return (
       <View style={styles.container}>
-        <EntriesList {...this.props} />
+        <NotesListComponent {...this.props} />
         <TouchableOpacity
           style={styles.recordButton}
           onPress={this.toggleModal}>
@@ -69,4 +69,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default TasksListScreen;

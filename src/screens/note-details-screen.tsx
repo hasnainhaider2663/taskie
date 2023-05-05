@@ -22,7 +22,7 @@ type State = {
     user?: any;
 };
 
-class Details extends Component<Props, State> {
+class NoteDetailsScreen extends Component<Props, State> {
     unsubscribeAuth;
     constructor(props: Props) {
         super(props);
@@ -156,4 +156,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Details;
+export default NoteDetailsScreen;

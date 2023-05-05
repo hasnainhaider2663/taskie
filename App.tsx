@@ -5,30 +5,71 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 import LoginScreen from './src/screens/login';
-import HomeScreen from './src/screens/home';
+import NotesScreen from './src/screens/notes-screen';
 import {firebaseConfig} from './FirebaseConfig'; // Import the AuthLoading component
 import OptionsScreen from './src/components/optionsScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import Details from './src/screens/details';
+import NoteDetailsScreen from './src/screens/note-details-screen';
 import {View, StyleSheet} from 'react-native';
+import TasksListScreen from "./src/screens/tasks-screen";
+import DashboardScreen from "./src/screens/dashboard";
+import TaskListDetailsScreen from "./src/screens/task-list-details-screen";
 
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function TabMenu() {
   return (
-    <Tab.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
-      <Tab.Screen name="Entries" component={HomeWrapper} />
-      <Tab.Screen name="Options" component={OptionsScreen} />
-    </Tab.Navigator>
+
+  <Tab.Navigator
+    initialRouteName="Home"
+    screenOptions={{
+      headerShown: false,
+      tabBarActiveTintColor: 'white',
+      tabBarInactiveTintColor: 'gray',
+      tabBarStyle: { backgroundColor: 'black' },
+    }}
+  >
+    {/*<Tab.Screen name="Dashboard" component={DashboardScreen} />*/}
+    {/*<Tab.Screen name="Tasks" component={TasksListScreen} />*/}
+    <Tab.Screen
+      name="Notes"
+      component={NotesWrapper}
+      options={{
+        tabBarLabel: 'Notes',
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="ios-book" color={color} size={size} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Options"
+      component={OptionsScreen}
+      options={{
+        tabBarLabel: 'Options',
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="ios-settings" color={color} size={size} />
+        ),
+      }}
+    />
+  </Tab.Navigator>
   );
 }
-function HomeWrapper() {
+function TasksListWrapper() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Details" component={Details} />
+      <Tab.Screen name="TasksListScreen" component={TasksListScreen} />
+      <Stack.Screen name="TaskListDetails" component={TaskListDetailsScreen} />
+    </Stack.Navigator>
+  );
+}
+function NotesWrapper() {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Tab.Screen name="NotesScreen" component={NotesScreen} />
+      <Stack.Screen name="NoteDetails" component={NoteDetailsScreen} />
     </Stack.Navigator>
   );
 }

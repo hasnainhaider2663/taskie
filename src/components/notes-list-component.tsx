@@ -10,7 +10,7 @@ interface State {
 
 }
 
-class EntriesList extends Component<any, State> {
+class NotesListComponent extends Component<any, State> {
   unsubscribeFirestore: any;
   userSub: any;
   constructor(props: any) {
@@ -20,7 +20,7 @@ class EntriesList extends Component<any, State> {
     };
   }
   handleNavigateToDetails = (entryId: string) => {
-    this.props.navigation.navigate('Details', { entryId });
+    this.props.navigation.navigate('NoteDetails', { entryId });
   };
   componentDidMount() {
     this.userSub = auth().onAuthStateChanged(user => {
@@ -49,7 +49,8 @@ class EntriesList extends Component<any, State> {
     }
   }
 
-  renderItem = ({ item }) => {
+  renderItem = ({ item,index }) => {
+    const itemNumber=index+1;
     const handlePlay = async () => {
       // Implement play functionality here
     };
@@ -58,7 +59,8 @@ class EntriesList extends Component<any, State> {
 
     return (
       <TouchableOpacity style={styles.listItem} onPress={() => this.handleNavigateToDetails(item.id)}>
-        <Text>{item.title}..</Text>
+        <Text style={styles.index}>{itemNumber<10?'0'+itemNumber:''}/</Text>
+        <Text style={styles.title}>{item.title}..</Text>
 
       </TouchableOpacity>
     );
@@ -82,17 +84,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
-    width: '100%'
+    width: '100%',
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     padding: 10,
-    borderBottomWidth: 1,
+    borderTopWidth: 1,
     borderColor: '#ccc',
+    color:'#fff'
+  },
+  index:{
+    color:'#fff',
+    padding:10
+  },
+  title:{
+    color:'#fff'
   }
 
 });
 
-export default EntriesList;
+export default NotesListComponent;
