@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity,Animated } from 'react-native';
+import { Entry } from "../models/recording";
+import Icon from "react-native-vector-icons/Ionicons";
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 interface State {
-  entries: any[],
+  entries: Entry[],
   user?: any,
 
 }
@@ -33,7 +36,7 @@ class NotesListComponent extends Component<any, State> {
         .doc(user.uid)
         .collection('entries')
         .onSnapshot(querySnapshot => {
-          const entries = querySnapshot.docs.map(doc => doc.data());
+          const entries = querySnapshot.docs.map(doc => doc.data() as Entry);
           console.log('entries', entries)
           this.setState({ entries });
         });
@@ -58,9 +61,14 @@ class NotesListComponent extends Component<any, State> {
 
 
     return (
-      <TouchableOpacity style={styles.listItem} onPress={() => this.handleNavigateToDetails(item.id)}>
+      <TouchableOpacity style={[styles.listItem, index===this.state.entries.length-1? {borderBottomWidth:0}:null]} onPress={() => this.handleNavigateToDetails(item.id)}>
         <Text style={styles.index}>{itemNumber<10?'0'+itemNumber:''}/</Text>
-        <Text style={styles.title}>{item.title}..</Text>
+        <View style={styles.textAreaWrapper}>
+          <Text style={styles.title}>{item.title}..</Text>
+          <Text style={styles.excerpt}>{item.blocks[0].block?.text}..</Text>
+
+        </View>
+        <Icon style={styles.linkArrow} name="arrow-forward" size={24} color="#FFFFFF" />
 
       </TouchableOpacity>
     );
@@ -70,9 +78,8 @@ class NotesListComponent extends Component<any, State> {
       return null
     return (
       <View style={styles.container}>
-        {this.state.user ? <FlatList
-          data={this.state.entries}
-          renderItem={this.renderItem}
+        {this.state.user ? <AnimatedFlatList showsVerticalScrollIndicator={false}
+          data={this.state.entries} onScroll={this.props.onScroll} renderItem={this.renderItem}
           keyExtractor={(item, index) => index.toString()}
         /> : null}
       </View>
@@ -88,19 +95,33 @@ const styles = StyleSheet.create({
   },
   listItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    padding: 10,
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    color:'#fff'
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    paddingBottom: 30,
+    color:'#F5F5F5',
+    borderBottomWidth:1,
+    borderColor:'#f5f5f5'
   },
   index:{
-    color:'#fff',
-    padding:10
+    color:'#aaa',
+    fontWeight:'bold',
+    paddingRight:10
   },
   title:{
-    color:'#fff'
+    color:'#fff',
+    fontSize:30
+  },
+  excerpt:{
+    color:'#a9a9a9',
+    fontSize:15,
+    paddingVertical:10
+  },
+  textAreaWrapper: {
+    width:'80%'
+  },
+  linkArrow: {
+    transform: [{ rotate: '-45deg' }],
   }
 
 });

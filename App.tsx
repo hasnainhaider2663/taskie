@@ -29,7 +29,7 @@ function TabMenu() {
       headerShown: false,
       tabBarActiveTintColor: 'white',
       tabBarInactiveTintColor: 'gray',
-      tabBarStyle: { backgroundColor: 'black' },
+      tabBarStyle: { backgroundColor: '#131313' },
     }}
   >
     {/*<Tab.Screen name="Dashboard" component={DashboardScreen} />*/}
@@ -122,7 +122,7 @@ class App extends React.Component<
     return (
       <View style={styles.container}>
         <NavigationContainer>
-          {!this.state.user ? <LoginScreen /> : <TabMenu />}
+          {!this.state.user ? <LoginScreen /> : <NotesWrapper />}
         </NavigationContainer>
       </View>
     );

@@ -1,28 +1,58 @@
 import React, { Component } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,Animated } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import AudioRecorder from "../components/recorder";
 import NotesListComponent from "../components/notes-list-component";
 import Modal from "react-native-modal";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import Value = Animated.Value;
 
 type User = FirebaseAuthTypes.UserInfo;
 
 class NotesScreen extends Component<{ navigation: any }, {
   isModalVisible: boolean,
   user?: User,
-  loading: boolean
+  loading: boolean,selectedFilter?:string,viewHeight:Value,isCollapsed:boolean
 }> {
   unsubscribeAuth;
-
+  prevScrollY
+  scrollY
   constructor(props) {
     super(props);
     this.state = {
-      isModalVisible: false, loading: true
+      isModalVisible: false, loading: true,
+      viewHeight: new Animated.Value(160), // Replace 100 with the initial height of your view
+      isCollapsed: false,
     };
-  }
+    this.scrollY = new Animated.Value(0);
+    this.prevScrollY = new Animated.Value(0);
 
+  }
+  toggleCollapse = () => {
+    const { isCollapsed, viewHeight } = this.state;
+    const initialHeight = 160; // Replace 100 with the initial height of your view
+    const collapsedHeight = 0;
+
+    // Start the animation
+    Animated.timing(viewHeight, {
+      toValue: isCollapsed ? initialHeight : collapsedHeight,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+
+    // Update the isCollapsed state
+    this.setState({ isCollapsed: !isCollapsed });
+  };
+  handleScroll = (event) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    if (scrollY > this.prevScrollY && !this.state.isCollapsed) {
+      this.toggleCollapse();
+    } else if (scrollY < this.prevScrollY && this.state.isCollapsed) {
+      this.toggleCollapse();
+    }
+    this.prevScrollY = scrollY;
+  };
   toggleModal = () => {
     this.setState({ isModalVisible: !this.state.isModalVisible });
   };
@@ -43,8 +73,10 @@ class NotesScreen extends Component<{ navigation: any }, {
 
   render() {
     return (
+
       <View style={styles.container}>
         <View style={styles.header}>
+
           <View style={styles.headerInner}>
             <Image
               source={{ uri: this.state.user?.photoURL }}
@@ -55,10 +87,12 @@ class NotesScreen extends Component<{ navigation: any }, {
           </View>
 
           <TouchableOpacity style={styles.recordButton} onPress={this.toggleModal}>
-            <Icon name="add" size={40} color="#FFFFFF" />
+            <Icon name="add" size={40} color="#F5F5F5" />
           </TouchableOpacity>
         </View>
-        <View style={styles.mainSectionWrapper}>
+
+        {/*{ height: this.state.viewHeight }*/}
+        <Animated.View style={[styles.mainSectionWrapper,{ height: this.state.viewHeight }]}>
           <View style={styles.yourNotesWrapper}>
 
         <Text style={styles.yourTitle}>your</Text>
@@ -66,20 +100,27 @@ class NotesScreen extends Component<{ navigation: any }, {
           </View>
 
           <Text style={styles.notesCount}>/14</Text>
-        </View>
+        </Animated.View>
 
         <View style={styles.filterContainer}>
-          <TouchableOpacity style={styles.filterButton}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={styles.filterButtonText}>#side hustle</Text>
+            </TouchableOpacity>
+          <TouchableOpacity style={[styles.filterButton,styles.filterSelected]}>
             <Text style={styles.filterButtonText}>#personal</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterButtonText}>#work</Text>
+            <Text style={[styles.filterButtonText]}>#work</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.filterButton}>
             <Text style={styles.filterButtonText}>#home</Text>
           </TouchableOpacity>
+          </ScrollView>
         </View>
-        <NotesListComponent {...this.props} />
+
+          <NotesListComponent {...this.props}       onScroll={this.handleScroll}
+          />
         <Modal
           isVisible={this.state.isModalVisible}
           onBackdropPress={this.toggleModal}
@@ -102,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    backgroundColor: "#000",
+    backgroundColor: "#131313",
     paddingTop: 60,
     paddingHorizontal:20
   },
@@ -112,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     borderBottomWidth: 1,
-    borderBottomColor: "#FFF",
+    borderBottomColor: "#F5F5F5",
     paddingVertical: 20
   },
   headerInner: {
@@ -131,7 +172,7 @@ const styles = StyleSheet.create({
     color: "#999"
   },
   username: {
-    color: "#FFF"
+    color: "#F5F5F5"
   },
   recordButton: {
     justifyContent: "center",
@@ -139,41 +180,50 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   yourTitle: {
-    color: "#FFF",
+    color: "#F5F5F5",
     maxWidth: 400,
     fontSize: 70,
-    fontWeight: "bold",
+    fontWeight: "400",
     paddingLeft: 20
   },
   notesTitle: {
-    color: "#FFF",
+    color: "#F5F5F5",
     maxWidth: 400,
     fontSize: 70,
-    fontWeight: "bold",
+    fontWeight: "400",
     paddingLeft: 40
   },
   notesCount: {
-    color: "#ccc",
+    color: "#bbb",
     fontSize: 46.6,
+    fontWeight: "500",
+
     marginBottom: 10
   },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    width: "100%"
+    width: "100%",
+    borderColor:'#f5f5f5',
+    borderBottomWidth:1,
+    paddingVertical:30
   },
   filterButton: {
     borderWidth: 1,
-    borderColor: "#FFF",
-    borderRadius: 20,
-    paddingVertical: 5,
+    borderColor: "#F5F5F5",
+    borderRadius: 100,
+    padding: 15,
     paddingHorizontal: 15,
-    marginVertical: 10
+    marginLeft: 10
+  },
+  filterSelected:{
+    borderColor: "#FE6902",
+    backgroundColor:'#FE6902'
   },
   filterButtonText: {
-    color: "#FFF",
-    fontSize: 16
+    color: "#F5F5F5",
+    fontSize: 20
   },
   modal: {
     justifyContent: "flex-end",
@@ -191,7 +241,11 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'flex-end'
   },
-  yourNotesWrapper: {  }
+  yourNotesWrapper: {  },
+  bottomSection: {
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+  }
 });
 
 export default NotesScreen;
