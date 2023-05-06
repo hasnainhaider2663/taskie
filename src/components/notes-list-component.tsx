@@ -79,7 +79,7 @@ class NotesListComponent extends Component<any, State> {
     return (
       <View style={styles.container}>
         {this.state.user ? <AnimatedFlatList showsVerticalScrollIndicator={false}
-          data={this.state.entries} onScroll={this.props.onScroll} renderItem={this.renderItem}
+          data={this.state.entries} onScroll={this.props.onScroll}  renderItem={this.renderItem}
           keyExtractor={(item, index) => index.toString()}
         /> : null}
       </View>
@@ -90,7 +90,6 @@ class NotesListComponent extends Component<any, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
     width: '100%',
   },
   listItem: {
@@ -100,7 +99,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 30,
     color:'#F5F5F5',
-    borderBottomWidth:1,
+    borderBottomWidth:0,
+    borderTopWidth:1,
     borderColor:'#f5f5f5'
   },
   index:{

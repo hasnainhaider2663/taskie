@@ -18,6 +18,8 @@ class NotesScreen extends Component<{ navigation: any }, {
   unsubscribeAuth;
   prevScrollY
   scrollY
+  debounceTimeout: any;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -45,14 +47,20 @@ class NotesScreen extends Component<{ navigation: any }, {
     this.setState({ isCollapsed: !isCollapsed });
   };
   handleScroll = (event) => {
-    const scrollY = event.nativeEvent.contentOffset.y;
-    if (scrollY > this.prevScrollY && !this.state.isCollapsed) {
-      this.toggleCollapse();
-    } else if (scrollY < this.prevScrollY && this.state.isCollapsed) {
-      this.toggleCollapse();
-    }
-    this.prevScrollY = scrollY;
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+    const collapseTogglePoint=30
+    console.log('currentScrollY',currentScrollY)
+    clearTimeout(this.debounceTimeout);
+    this.debounceTimeout = setTimeout(() => {
+      if (currentScrollY > collapseTogglePoint && !this.state.isCollapsed) {
+        this.toggleCollapse();
+      } else if (currentScrollY < collapseTogglePoint&& this.state.isCollapsed) {
+        this.toggleCollapse();
+      }
+      this.prevScrollY = currentScrollY;
+    }, 5); // 200 ms debounce time, adjust as needed
   };
+
   toggleModal = () => {
     this.setState({ isModalVisible: !this.state.isModalVisible });
   };
@@ -206,7 +214,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     borderColor:'#f5f5f5',
-    borderBottomWidth:1,
     paddingVertical:30
   },
   filterButton: {
