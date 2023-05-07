@@ -92,25 +92,6 @@ class AudioRecorder extends Component<{}, State> {
       <View style={styles.container}>
         <View style={styles.mainContainer}>
           <Text style={styles.docText}>{this.state.doc?.blocks[0].block.text}</Text>
-          {this.state.doc.status === 'done' ? (
-            <View style={styles.playbackContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  this.state.isPlaying ? styles.stopButton : styles.playButton,
-                ]}
-                onPress={
-                  this.state.isPlaying ? this.stopPlayback : this.startPlayback
-                }
-                disabled={!this.state.audioPath}>
-                {this.state.isPlaying ? (
-                  <Icon name="stop" size={24} color="#FFF" />
-                ) : (
-                  <Icon name="play" size={24} color="#FFF" />
-                )}
-              </TouchableOpacity>
-            </View>
-          ) : null}
         </View>
         <View style={styles.outerButtonContainer}>
           <View style={styles.buttonContainer}>
@@ -121,8 +102,8 @@ class AudioRecorder extends Component<{}, State> {
                 onPressOut={this.handleRecordPressOut}>
                 <Icon
                   name={this.state.isRecording ? 'stop' : 'mic'}
-                  size={iconSize}
-                  color="#FFF"
+                  size={iconSize} style={styles.icon}
+
                 />
               </TouchableOpacity>
             </Animated.View>
@@ -145,7 +126,7 @@ class AudioRecorder extends Component<{}, State> {
             blocks: [
               {
                 block: {
-                  text: `Hello ${user.displayName?.split(' ')[0]}! \n Tap the mic to start speaking and talk to me about your tasks or just record notes`,
+                  text: `Hold the mic to start speaking and release to save your note.`,
                 }
               }
             ],
@@ -228,27 +209,6 @@ class AudioRecorder extends Component<{}, State> {
       await firestoreDoc.update({ blocks: [{ block: { text: 'Thinking about what you said...' }, type: 'text' }] });
     });
   };
-
-  startPlayback = async () => {
-    if (this.state.audioPath) {
-      this.setState({ isPlaying: true });
-      const result = await this.audioRecorderPlayer.startPlayer(
-        this.state.audioPath,
-      );
-      this.audioRecorderPlayer.addPlayBackListener((e: any) => {
-        if (e.current_position === e.duration) {
-          this.stopPlayback();
-        }
-        return;
-      });
-    }
-  };
-
-  stopPlayback = async () => {
-    await this.audioRecorderPlayer.stopPlayer();
-    this.audioRecorderPlayer.removePlayBackListener();
-    this.setState({ isPlaying: false });
-  };
 }
 
 const styles = StyleSheet.create({
@@ -256,16 +216,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#131313',
     width: '100%',
   },
   outerButtonContainer: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#131313',
     paddingTop: 30,
     width: '100%',
   },
   mainContainer: {
     marginBottom: 50,
+    alignItems:"center"
   },
   playbackContainer: {
     alignItems: 'center',
@@ -277,8 +238,8 @@ const styles = StyleSheet.create({
   },
   buttonShadow: {
     borderRadius: 1000,
-    backgroundColor: '#000',
-    shadowColor: '#000',
+    backgroundColor: '#fff',
+    shadowColor: '#fff',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -315,35 +276,31 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   buttonText: {
-    color: '#fff',
+    color: '#131313',
     fontSize: 18,
   },
   statusText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#000',
+    color: '#131313',
   },
   docText: {
-    marginTop: 20,
     fontSize: 26,
-    color: '#2D2D2D',
+    color: '#fff',
     fontFamily: Platform.OS === 'ios' ? 'Helvetica' : 'Roboto',
     fontStyle: 'normal',
     fontWeight: '200',
     letterSpacing: 0.6,
     lineHeight: 24,
     textAlign: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#F7F7F7',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 30,
-    shadowColor: '#000',
+    maxWidth: '90%',
+    shadowColor: '#fff',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
-  },
+  }, icon: { color:'#131313' }
+
 });
 
 const readFile = async (path: string, encoding: string): Promise<string> => {

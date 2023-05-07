@@ -214,7 +214,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     borderColor:'#f5f5f5',
-    paddingVertical:30
+    paddingVertical:30,
+    borderBottomWidth:1
   },
   filterButton: {
     borderWidth: 1,
