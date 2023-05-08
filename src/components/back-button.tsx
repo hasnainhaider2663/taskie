@@ -11,20 +11,15 @@ const BackButton = () => {
             style={styles.button}
             onPress={() => navigation.goBack()}
         >
-            <Icon name="arrow-back" size={24} color="#FFFFFF" />
+            <Icon name="arrow-back" size={30} color="#131313" />
         </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: 'grey',
         width: 40,
         height: 40,
-        marginTop: 10,
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });
 
