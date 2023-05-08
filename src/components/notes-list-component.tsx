@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  Appearance,
+  ColorSchemeName,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import { Entry } from "../models/recording";
@@ -7,21 +16,23 @@ import Icon from "react-native-vector-icons/Ionicons";
 import padWithZeroes from "../helpers/padWithZeroes";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
-
 interface State {
   entries: Entry[],
   user?: any,
+  colorScheme:ColorSchemeName
 
 }
 
 class NotesListComponent extends Component<any, State> {
   unsubscribeFirestore: any;
   userSub: any;
-
+  colorSchemeSubscription
   constructor(props: any) {
     super(props);
     this.state = {
-      entries: []
+      entries: [],
+      colorScheme: Appearance.getColorScheme(),
+
     };
   }
 
@@ -30,6 +41,9 @@ class NotesListComponent extends Component<any, State> {
   };
 
   componentDidMount() {
+    this.colorSchemeSubscription = Appearance.addChangeListener(({ colorScheme }) => {
+      this.setState({ colorScheme });
+    });
     this.userSub = auth().onAuthStateChanged(user => {
       this.setState({ user });
     });
@@ -49,6 +63,7 @@ class NotesListComponent extends Component<any, State> {
   }
 
   componentWillUnmount() {
+    this.colorSchemeSubscription.remove();
     if (this.unsubscribeFirestore) {
       this.unsubscribeFirestore();
     }
@@ -58,6 +73,8 @@ class NotesListComponent extends Component<any, State> {
   }
 
   renderItem = ({ item, index }) => {
+
+    const styles = dynamicStyles(this.state.colorScheme);
     const itemNumber = index + 1;
 
 
@@ -93,6 +110,8 @@ class NotesListComponent extends Component<any, State> {
   };
 
   render() {
+    const styles = dynamicStyles(this.state.colorScheme);
+
     if (!this.state.user)
       return null;
     return (
@@ -106,60 +125,58 @@ class NotesListComponent extends Component<any, State> {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: "100%"
-  },
-  listItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingTop: 10,
-    paddingBottom: 30,
-    color: "#F5F5F5",
-    borderBottomWidth: 0,
-    borderTopWidth: 1,
-    borderColor: "#f5f5f5"
-  },
-  contentWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    flex: 1
-  },
-  index: {
-    color: "#aaa",
-    fontWeight: "bold",
-    textAlign:'left',
-  },
-  title: {
-    color: "#fff",
-    fontSize: 30,
-    maxWidth: "100%",
-
-  },
-  excerpt: {
-    color: "#a9a9a9",
-    fontSize: 15,
-    paddingVertical: 10,
-    maxWidth: "100%",
-
-  },
-  textAreaWrapper: {
-    maxWidth: "90%",
-    minWidth:'90%',
-    paddingLeft: 10,
-
-  },
-  linkArrow: {
-    transform: [{ rotate: "-45deg" }],
-    position: "absolute",
-    right: 0,
-    top:0
-  }
-
-});
+const dynamicStyles = (colorScheme:ColorSchemeName) => {
+  const isDark = colorScheme === "dark";
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      width: "100%",
+    },
+    listItem: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      paddingTop: 10,
+      paddingBottom: 30,
+      color: isDark ? "#F5F5F5" : "#131313",
+      borderBottomWidth: 0,
+      borderTopWidth: 1,
+      borderColor: isDark ? "#F5F5F5" : "#131313",
+    },
+    contentWrapper: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      flex: 1,
+    },
+    index: {
+      color: isDark ? "#aaa" : "#555",
+      fontWeight: "bold",
+      textAlign: 'left',
+    },
+    title: {
+      color: isDark ? "#fff" : "#333",
+      fontSize: 30,
+      maxWidth: "100%",
+    },
+    excerpt: {
+      color: isDark ? "#a9a9a9" : "#767676",
+      fontSize: 15,
+      paddingVertical: 10,
+      maxWidth: "100%",
+    },
+    textAreaWrapper: {
+      maxWidth: "90%",
+      minWidth: '90%',
+      paddingLeft: 10,
+    },
+    linkArrow: {
+      transform: [{ rotate: "-45deg" }],
+      position: "absolute",
+      right: 0,
+      top: 0,
+    },
+  });
+};
 
 export default NotesListComponent;

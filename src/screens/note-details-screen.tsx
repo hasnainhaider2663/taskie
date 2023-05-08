@@ -1,11 +1,21 @@
-// Details.tsx
 import React, { Component } from "react";
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert, Appearance,
+  Image,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from "react-native";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { Block, BlockType, ChechListItem, CheckListBlock, ImageBlock, TextBlock } from "../models/blocks";
 import BackButton from "../components/back-button";
 import EditTextControls from "../components/edit-text-controls";
+import { ColorSchemeName } from "react-native/Libraries/Utilities/Appearance";
 
 type Props = {
   route: {
@@ -20,24 +30,73 @@ type State = {
   entry: any;
   isLoading: boolean;
   user?: any;
+  isDark?: boolean;
 };
 
 class NoteDetailsScreen extends Component<Props, State> {
   unsubscribeAuth;
-
+  colorSchemeSubscription
   constructor(props: Props) {
     super(props);
     this.state = {
       entry: null,
-      isLoading: true
-
+      isLoading: true,
+      isDark: Appearance.getColorScheme()==='dark' // Set this to true for dark mode
     };
   }
 
+  // Add dynamicStyles function here
+  dynamicStyles = (isDark) => {
+    return StyleSheet.create({
+      container: {
+        flex: 1,
+        paddingTop: 70,
+        paddingHorizontal: 20,
+        backgroundColor: isDark ? "#131313" : "#F5F5F5"
+      },
+      headerContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+      },
+      border: {
+        borderBottomWidth: 1,
+        borderColor: isDark ? "#F5F5F5" : "#131313",
+        marginVertical: 10
+      },
+      textContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      },
+      textLeft: {
+        textAlign: "left",
+        color: isDark ? "#909090" : "#666666"
+      },
+      textRight: {
+        textAlign: "right",
+        color: isDark ? "#909090" : "#666666"
+      },
+      blockContainer: {},
+      image: {},
+      title: {
+        paddingVertical: 30,
+        fontSize: 60,
+        fontWeight: "500",
+        color: isDark ? "#F5F5F5" : "#131313"
+      },
+      text: {
+        fontSize: 20,
+        width: '100%',
+        color: isDark ? '#F5F5F5' : '#494949'
+      }
+    });
+  };
+
 
   render() {
-    const { isLoading, entry } = this.state;
-
+    const { isLoading, entry, isDark } = this.state;
+    const styles = this.dynamicStyles(isDark);
     if (isLoading) {
       return (
         <View style={styles.container}>
@@ -47,6 +106,8 @@ class NoteDetailsScreen extends Component<Props, State> {
     }
 
     return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <BackButton />
@@ -66,11 +127,12 @@ class NoteDetailsScreen extends Component<Props, State> {
         <Text style={styles.title}>{entry.title}</Text>
         {entry.blocks?.map((block: Block, index: number) => (
           <React.Fragment key={index}>
-            {renderBlock(block)}
+            {this.renderBlock(block)}
           </React.Fragment>
         ))}
         <EditTextControls />
       </View>
+      </TouchableWithoutFeedback>
     );
   }
 
@@ -80,10 +142,15 @@ class NoteDetailsScreen extends Component<Props, State> {
       this.setState({ user });
       await this.fetchEntry();
     });
+    this.colorSchemeSubscription = Appearance.addChangeListener(({ colorScheme }) => {
+      this.setState({ isDark:colorScheme==='dark' });
+    });
   }
 
   componentWillUnmount() {
     this.unsubscribeAuth();
+    this.colorSchemeSubscription.remove();
+
   }
 
   async fetchEntry() {
@@ -143,59 +210,85 @@ class NoteDetailsScreen extends Component<Props, State> {
     }
   }
 
+  handleInputChange(blockItem: Block, text: string) {
+    // Update the text of the TextBlock
+    // (blockItem.block as TextBlock).text = text;
+    let entry= this.state.entry;
+    entry.blocks[0].block= { text }
+
+    this.setState({entry})
+    console.log(this.state.entry.blocks[0])
+
+  }
+
+  async saveChanges(blockItem: Block) {
+    console.log('save the changes!!!')
+    // Save the changes to your data source
+    // For example, you can update the Firestore document here
+    // Be sure to handle the saving logic based on your data structure
+  }
+   renderBlock(blockItem: Block) {
+    switch (blockItem.type) {
+      case BlockType.TextBlock:
+        return (
+          <View style={styles.blockContainer}>
+            <TextInput
+              style={styles.text}
+              value={(blockItem.block as TextBlock).text}
+              multiline={true}
+              keyboardAppearance="default"
+              inputMode="text"
+              onChangeText={text => this.handleInputChange(blockItem, text)}
+              onBlur={() => this.saveChanges(blockItem)}
+              returnKeyType={"done"}
+            />
+
+          </View>
+        );
+      case BlockType.AudioBlock:
+        return (
+          <View style={styles.blockContainer}>
+            {/* Render your audio player component with the audio source */}
+            {/* Example: <AudioPlayer source={(block as AudioBlock).audio} /> */}
+          </View>
+        );
+      case BlockType.ImageBlock:
+        return (
+          <View style={styles.blockContainer}>
+            <Image style={styles.image} source={{ uri: (blockItem.block as ImageBlock).imgUrl }} />
+          </View>
+        );
+      case BlockType.VideoBlock:
+        return (
+          <View style={styles.blockContainer}>
+            {/* Render your video player component with the video source */}
+            {/* Example: <VideoPlayer source={(block as VideoBlock).videoUrl} /> */}
+          </View>
+        );
+      case BlockType.CheckListBlock:
+        return (
+          <View style={styles.blockContainer}>
+            {(blockItem.block as CheckListBlock).items.map((item: ChechListItem, index: number) => (
+              <TouchableOpacity key={index} onPress={() => {
+              }}>
+                <Text style={styles.text}>{item.text}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
 
 }
 
-const renderBlock = (blockItem: Block) => {
-  switch (blockItem.type) {
-    case BlockType.TextBlock:
-      return (
-        <View style={styles.blockContainer}>
-          <Text style={styles.text}>{(blockItem.block as TextBlock).text}</Text>
-        </View>
-      );
-    case BlockType.AudioBlock:
-      return (
-        <View style={styles.blockContainer}>
-          {/* Render your audio player component with the audio source */}
-          {/* Example: <AudioPlayer source={(block as AudioBlock).audio} /> */}
-        </View>
-      );
-    case BlockType.ImageBlock:
-      return (
-        <View style={styles.blockContainer}>
-          <Image style={styles.image} source={{ uri: (blockItem.block as ImageBlock).imgUrl }} />
-        </View>
-      );
-    case BlockType.VideoBlock:
-      return (
-        <View style={styles.blockContainer}>
-          {/* Render your video player component with the video source */}
-          {/* Example: <VideoPlayer source={(block as VideoBlock).videoUrl} /> */}
-        </View>
-      );
-    case BlockType.CheckListBlock:
-      return (
-        <View style={styles.blockContainer}>
-          {(blockItem.block as CheckListBlock).items.map((item: ChechListItem, index: number) => (
-            <TouchableOpacity key={index} onPress={() => {
-            }}>
-              <Text style={styles.text}>{item.text}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      );
-    default:
-      return null;
-  }
-};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 70,
     paddingHorizontal: 20
-
   },
   headerContainer: {
     flexDirection: "row",
@@ -210,15 +303,15 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center"
+    alignItems: "center",
   },
   textLeft: {
     textAlign: "left",
-    color: "#808080"
+    color: "#909090"
   },
   textRight: {
     textAlign: "right",
-    color: "#808080"
+    color: "#909090"
   },
   blockContainer: {},
   image: {},
@@ -228,7 +321,10 @@ const styles = StyleSheet.create({
     fontWeight: "500"
   },
   text: {
-    fontSize: 20
+    fontSize: 20,
+    width:'100%',
+    color:'#494949'
+
   }
 });
 

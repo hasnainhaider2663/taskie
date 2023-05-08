@@ -29,6 +29,7 @@
     "npm": "^9.6.5",
     "react": "18.2.0",
     "react-native": "0.71.7",
+    "react-native-appearance": "^0.3.4",
     "react-native-audio-recorder-player": "^3.5.3",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.9.0",
