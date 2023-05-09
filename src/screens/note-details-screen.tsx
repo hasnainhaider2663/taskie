@@ -45,58 +45,11 @@ class NoteDetailsScreen extends Component<Props, State> {
     };
   }
 
-  // Add dynamicStyles function here
-  dynamicStyles = (isDark) => {
-    return StyleSheet.create({
-      container: {
-        flex: 1,
-        paddingTop: 70,
-        paddingHorizontal: 20,
-        backgroundColor: isDark ? "#131313" : "#F5F5F5"
-      },
-      headerContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-      },
-      border: {
-        borderBottomWidth: 1,
-        borderColor: isDark ? "#F5F5F5" : "#131313",
-        marginVertical: 10
-      },
-      textContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      },
-      textLeft: {
-        textAlign: "left",
-        color: isDark ? "#909090" : "#666666"
-      },
-      textRight: {
-        textAlign: "right",
-        color: isDark ? "#909090" : "#666666"
-      },
-      blockContainer: {},
-      image: {},
-      title: {
-        paddingVertical: 30,
-        fontSize: 60,
-        fontWeight: "500",
-        color: isDark ? "#F5F5F5" : "#131313"
-      },
-      text: {
-        fontSize: 20,
-        width: '100%',
-        color: isDark ? '#F5F5F5' : '#494949'
-      }
-    });
-  };
 
 
   render() {
     const { isLoading, entry, isDark } = this.state;
-    const styles = this.dynamicStyles(isDark);
+    const styles = styles(isDark);
     if (isLoading) {
       return (
         <View style={styles.container}>
@@ -110,7 +63,7 @@ class NoteDetailsScreen extends Component<Props, State> {
 
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <BackButton />
+          <BackButton isDark={!!this.state.isDark} />
           <TouchableOpacity onPress={() => this.showDeleteConfirmation()}>
             <Text style={[styles.textRight, { color: "#131313" }]}>delete</Text>
           </TouchableOpacity>
@@ -284,48 +237,51 @@ class NoteDetailsScreen extends Component<Props, State> {
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 70,
-    paddingHorizontal: 20
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  border: {
-    borderBottomWidth: 1,
-    borderColor: "#131313",
-    marginVertical: 10
-  },
-  textContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  textLeft: {
-    textAlign: "left",
-    color: "#909090"
-  },
-  textRight: {
-    textAlign: "right",
-    color: "#909090"
-  },
-  blockContainer: {},
-  image: {},
-  title: {
-    paddingVertical: 30,
-    fontSize: 60,
-    fontWeight: "500"
-  },
-  text: {
-    fontSize: 20,
-    width:'100%',
-    color:'#494949'
-
-  }
-});
+const dynamicStyles=(isDark=false) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 70,
+      paddingHorizontal: 20,
+      backgroundColor: isDark ? "#131313" : "#F5F5F5"
+    },
+    headerContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center"
+    },
+    border: {
+      borderBottomWidth: 1,
+      borderColor: isDark ? "#F5F5F5" : "#131313",
+      marginVertical: 10
+    },
+    textContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    textLeft: {
+      textAlign: "left",
+      color: isDark ? "#909090" : "#666666"
+    },
+    textRight: {
+      textAlign: "right",
+      color: isDark ? "#909090" : "#666666"
+    },
+    blockContainer: {},
+    image: {},
+    title: {
+      paddingVertical: 30,
+      fontSize: 60,
+      fontWeight: "500",
+      color: isDark ? "#F5F5F5" : "#131313"
+    },
+    text: {
+      fontSize: 20,
+      width: '100%',
+      color: isDark ? '#F5F5F5' : '#494949'
+    }
+  });
+}
 
 export default NoteDetailsScreen;

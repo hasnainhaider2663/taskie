@@ -121,7 +121,7 @@ class NotesScreen extends Component<
           </View>
 
           <TouchableOpacity style={styles.recordButton} onPress={this.toggleModal}>
-            <Icon name="add" size={40} color="#F5F5F5" />
+            <Icon name="add" size={40} style={styles.recordButtonIcon} />
           </TouchableOpacity>
         </View>
 
@@ -215,6 +215,8 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
       justifyContent: "center",
       alignItems: "center",
       marginRight: 10,
+    }, recordButtonIcon: {
+      color: isDark ? "#F5F5F5" : "#333333",
     },
     yourTitle: {
       color: isDark ? "#F5F5F5" : "#333333",
@@ -289,7 +291,8 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
     bottomSection: {
       borderTopWidth: 1,
       borderColor: isDark ? "#ccc" : "#555555",
-    },
+    }
+
   });
 };
 

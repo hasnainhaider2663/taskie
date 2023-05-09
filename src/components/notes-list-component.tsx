@@ -101,7 +101,6 @@ class NotesListComponent extends Component<any, State> {
             style={styles.linkArrow}
             name="arrow-forward"
             size={24}
-            color="#FFFFFF"
           />
         </View>
       </TouchableOpacity>
@@ -173,6 +172,7 @@ const dynamicStyles = (colorScheme:ColorSchemeName) => {
     linkArrow: {
       transform: [{ rotate: "-45deg" }],
       position: "absolute",
+      color: isDark ? "#F5F5F5" : "#131313",
       right: 0,
       top: 0,
     },
