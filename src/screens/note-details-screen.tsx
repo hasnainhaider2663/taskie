@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {
-  Alert, Appearance,
+  Alert,
+  Appearance,
   Image,
   Keyboard,
   StyleSheet,
@@ -15,7 +16,6 @@ import auth from "@react-native-firebase/auth";
 import { Block, BlockType, ChechListItem, CheckListBlock, ImageBlock, TextBlock } from "../models/blocks";
 import BackButton from "../components/back-button";
 import EditTextControls from "../components/edit-text-controls";
-import { ColorSchemeName } from "react-native/Libraries/Utilities/Appearance";
 
 type Props = {
   route: {
@@ -35,21 +35,21 @@ type State = {
 
 class NoteDetailsScreen extends Component<Props, State> {
   unsubscribeAuth;
-  colorSchemeSubscription
+  colorSchemeSubscription;
+
   constructor(props: Props) {
     super(props);
     this.state = {
       entry: null,
       isLoading: true,
-      isDark: Appearance.getColorScheme()==='dark' // Set this to true for dark mode
+      isDark: Appearance.getColorScheme() === "dark" // Set this to true for dark mode
     };
   }
 
 
-
   render() {
     const { isLoading, entry, isDark } = this.state;
-    const styles = styles(isDark);
+    const styles = dynamicStyles(isDark);
     if (isLoading) {
       return (
         <View style={styles.container}>
@@ -61,30 +61,30 @@ class NoteDetailsScreen extends Component<Props, State> {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <BackButton isDark={!!this.state.isDark} />
-          <TouchableOpacity onPress={() => this.showDeleteConfirmation()}>
-            <Text style={[styles.textRight, { color: "#131313" }]}>delete</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.border} />
-        <View style={styles.textContainer}>
-          <Text style={styles.textLeft}>18/11/22</Text>
-          <TouchableOpacity>
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <BackButton isDark={!!this.state.isDark} />
+            <TouchableOpacity onPress={() => this.showDeleteConfirmation()}>
+              <Text style={[styles.textRight, { color: "#131313" }]}>delete</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.border} />
+          <View style={styles.textContainer}>
+            <Text style={styles.textLeft}>18/11/22</Text>
+            <TouchableOpacity>
 
-            <Text style={styles.textRight}>#work</Text>
-          </TouchableOpacity>
+              <Text style={styles.textRight}>#work</Text>
+            </TouchableOpacity>
 
+          </View>
+          <Text style={styles.title}>{entry.title}</Text>
+          {entry.blocks?.map((block: Block, index: number) => (
+            <React.Fragment key={index}>
+              {this.renderBlock(block)}
+            </React.Fragment>
+          ))}
+          <EditTextControls />
         </View>
-        <Text style={styles.title}>{entry.title}</Text>
-        {entry.blocks?.map((block: Block, index: number) => (
-          <React.Fragment key={index}>
-            {this.renderBlock(block)}
-          </React.Fragment>
-        ))}
-        <EditTextControls />
-      </View>
       </TouchableWithoutFeedback>
     );
   }
@@ -96,7 +96,7 @@ class NoteDetailsScreen extends Component<Props, State> {
       await this.fetchEntry();
     });
     this.colorSchemeSubscription = Appearance.addChangeListener(({ colorScheme }) => {
-      this.setState({ isDark:colorScheme==='dark' });
+      this.setState({ isDark: colorScheme === "dark" });
     });
   }
 
@@ -166,21 +166,21 @@ class NoteDetailsScreen extends Component<Props, State> {
   handleInputChange(blockItem: Block, text: string) {
     // Update the text of the TextBlock
     // (blockItem.block as TextBlock).text = text;
-    let entry= this.state.entry;
-    entry.blocks[0].block= { text }
+    let entry = this.state.entry;
+    entry.blocks[0].block = { text };
 
-    this.setState({entry})
-    console.log(this.state.entry.blocks[0])
+    this.setState({ entry });
+    console.log(this.state.entry.blocks[0]);
 
   }
 
   async saveChanges(blockItem: Block) {
-    console.log('save the changes!!!')
-    // Save the changes to your data source
-    // For example, you can update the Firestore document here
-    // Be sure to handle the saving logic based on your data structure
+    console.log("save the changes!!!");
   }
-   renderBlock(blockItem: Block) {
+
+  renderBlock(blockItem: Block) {
+    const { isDark } = this.state;
+    const styles = dynamicStyles(isDark);
     switch (blockItem.type) {
       case BlockType.TextBlock:
         return (
@@ -237,7 +237,7 @@ class NoteDetailsScreen extends Component<Props, State> {
 }
 
 
-const dynamicStyles=(isDark=false) => {
+const dynamicStyles = (isDark = false) => {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -258,7 +258,7 @@ const dynamicStyles=(isDark=false) => {
     textContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "center",
+      alignItems: "center"
     },
     textLeft: {
       textAlign: "left",
@@ -278,10 +278,10 @@ const dynamicStyles=(isDark=false) => {
     },
     text: {
       fontSize: 20,
-      width: '100%',
-      color: isDark ? '#F5F5F5' : '#494949'
+      width: "100%",
+      color: isDark ? "#F5F5F5" : "#494949"
     }
   });
-}
+};
 
 export default NoteDetailsScreen;

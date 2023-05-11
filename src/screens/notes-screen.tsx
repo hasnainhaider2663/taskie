@@ -192,7 +192,7 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
       width: "100%",
       borderBottomWidth: 1,
       borderBottomColor: isDark ? "#F5F5F5" : "#333333",
-      paddingVertical: 20,
+      paddingBottom: 20,
     },
     headerInner: {
       flexDirection: "row",
