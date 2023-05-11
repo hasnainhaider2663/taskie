@@ -1,5 +1,6 @@
-export default function padWithZeroes(number, digits) {
+export default function padWithZeroes(number:number, digits:number) {
   const numberString = number.toString();
-  const paddingLength = Math.max(digits - numberString.length, 0);
+  let paddingLength = Math.max(digits - numberString.length, 0);
+
   return "0".repeat(paddingLength) + numberString;
 }
