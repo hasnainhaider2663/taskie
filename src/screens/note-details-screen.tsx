@@ -72,7 +72,6 @@ class NoteDetailsScreen extends Component<Props, State> {
           <View style={styles.textContainer}>
             <Text style={styles.textLeft}>18/11/22</Text>
             <TouchableOpacity>
-
               <Text style={styles.textRight}>#work</Text>
             </TouchableOpacity>
 
