@@ -4,6 +4,7 @@ import {
   Appearance,
   ColorSchemeName,
   FlatList,
+  NativeEventSubscription,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,22 +12,23 @@ import {
 } from "react-native";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import { Entry } from "../models/recording";
 import Icon from "react-native-vector-icons/Ionicons";
 import padWithZeroes from "../helpers/padWithZeroes";
+import { Entry } from "../models/entry";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+
 interface State {
   entries: Entry[],
   user?: any,
-  colorScheme:ColorSchemeName
+  colorScheme: ColorSchemeName
 
 }
 
 class NotesListComponent extends Component<any, State> {
   unsubscribeFirestore: any;
   userSub: any;
-  colorSchemeSubscription
+  colorSchemeSubscription!: NativeEventSubscription
   constructor(props: any) {
     super(props);
     this.state = {
@@ -95,7 +97,7 @@ class NotesListComponent extends Component<any, State> {
         <View style={styles.contentWrapper}>
           <View style={styles.textAreaWrapper}>
             <Text style={styles.title}>{item.title}...</Text>
-            <Text style={styles.excerpt}>{item.blocks[0].block?.text}..</Text>
+            <Text style={styles.excerpt}>{item.text}..</Text>
           </View>
           <Icon
             style={styles.linkArrow}

@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import {
   Alert,
   Appearance,
-  Image,
   Keyboard,
+  NativeEventSubscription,
   StyleSheet,
   Text,
   TextInput,
@@ -13,9 +13,9 @@ import {
 } from "react-native";
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { Block, BlockType, ChechListItem, CheckListBlock, ImageBlock, TextBlock } from "../models/blocks";
 import BackButton from "../components/back-button";
 import EditTextControls from "../components/edit-text-controls";
+import { Entry } from "../models/entry";
 
 type Props = {
   route: {
@@ -27,20 +27,20 @@ type Props = {
 };
 
 type State = {
-  entry: any;
+  entry?: Entry;
   isLoading: boolean;
   user?: any;
   isDark?: boolean;
 };
 
 class NoteDetailsScreen extends Component<Props, State> {
-  unsubscribeAuth;
-  colorSchemeSubscription;
+  unsubscribeAuth?: () => void;
+  colorSchemeSubscription?: NativeEventSubscription;
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      entry: null,
+      entry: undefined,
       isLoading: true,
       isDark: Appearance.getColorScheme() === "dark" // Set this to true for dark mode
     };
@@ -50,7 +50,7 @@ class NoteDetailsScreen extends Component<Props, State> {
   render() {
     const { isLoading, entry, isDark } = this.state;
     const styles = dynamicStyles(isDark);
-    if (isLoading) {
+    if (isLoading || !entry) {
       return (
         <View style={styles.container}>
           <Text>Loading...</Text>
@@ -65,7 +65,7 @@ class NoteDetailsScreen extends Component<Props, State> {
           <View style={styles.headerContainer}>
             <BackButton isDark={!!this.state.isDark} />
             <TouchableOpacity onPress={() => this.showDeleteConfirmation()}>
-              <Text style={[styles.textRight, { color: "#131313" }]}>delete</Text>
+              <Text style={[styles.textRight, styles.deleteBtn]}>delete</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.border} />
@@ -77,11 +77,21 @@ class NoteDetailsScreen extends Component<Props, State> {
 
           </View>
           <Text style={styles.title}>{entry.title}</Text>
-          {entry.blocks?.map((block: Block, index: number) => (
-            <React.Fragment key={index}>
-              {this.renderBlock(block)}
-            </React.Fragment>
-          ))}
+
+          <View style={styles.blockContainer}>
+            <TextInput
+              style={styles.text}
+              value={entry.text}
+              multiline={true}
+              keyboardAppearance="default"
+              inputMode="text"
+              onChangeText={text => this.handleInputChange(text)}
+              onBlur={() => this.saveChanges(entry)}
+              returnKeyType={"done"}
+            />
+
+          </View>
+
           <EditTextControls />
         </View>
       </TouchableWithoutFeedback>
@@ -100,9 +110,12 @@ class NoteDetailsScreen extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.unsubscribeAuth();
-    this.colorSchemeSubscription.remove();
-
+    if (this.unsubscribeAuth) {
+      this.unsubscribeAuth();
+    }
+    if (this.colorSchemeSubscription) {
+      this.colorSchemeSubscription.remove();
+    }
   }
 
   async fetchEntry() {
@@ -113,7 +126,7 @@ class NoteDetailsScreen extends Component<Props, State> {
       entryRef.onSnapshot(entryDoc => {
         if (entryDoc.exists) {
           this.setState({
-            entry: entryDoc.data(),
+            entry: entryDoc.data() as Entry,
             isLoading: false
           });
         } else {
@@ -162,77 +175,22 @@ class NoteDetailsScreen extends Component<Props, State> {
     }
   }
 
-  handleInputChange(blockItem: Block, text: string) {
+  handleInputChange(text: string) {
     // Update the text of the TextBlock
     // (blockItem.block as TextBlock).text = text;
+    if (!this.state.entry)
+      return;
     let entry = this.state.entry;
-    entry.blocks[0].block = { text };
+    entry.text = text;
 
     this.setState({ entry });
-    console.log(this.state.entry.blocks[0]);
+    console.log(this.state.entry);
 
   }
 
-  async saveChanges(blockItem: Block) {
+  async saveChanges(entry: Entry) {
     console.log("save the changes!!!");
   }
-
-  renderBlock(blockItem: Block) {
-    const { isDark } = this.state;
-    const styles = dynamicStyles(isDark);
-    switch (blockItem.type) {
-      case BlockType.TextBlock:
-        return (
-          <View style={styles.blockContainer}>
-            <TextInput
-              style={styles.text}
-              value={(blockItem.block as TextBlock).text}
-              multiline={true}
-              keyboardAppearance="default"
-              inputMode="text"
-              onChangeText={text => this.handleInputChange(blockItem, text)}
-              onBlur={() => this.saveChanges(blockItem)}
-              returnKeyType={"done"}
-            />
-
-          </View>
-        );
-      case BlockType.AudioBlock:
-        return (
-          <View style={styles.blockContainer}>
-            {/* Render your audio player component with the audio source */}
-            {/* Example: <AudioPlayer source={(block as AudioBlock).audio} /> */}
-          </View>
-        );
-      case BlockType.ImageBlock:
-        return (
-          <View style={styles.blockContainer}>
-            <Image style={styles.image} source={{ uri: (blockItem.block as ImageBlock).imgUrl }} />
-          </View>
-        );
-      case BlockType.VideoBlock:
-        return (
-          <View style={styles.blockContainer}>
-            {/* Render your video player component with the video source */}
-            {/* Example: <VideoPlayer source={(block as VideoBlock).videoUrl} /> */}
-          </View>
-        );
-      case BlockType.CheckListBlock:
-        return (
-          <View style={styles.blockContainer}>
-            {(blockItem.block as CheckListBlock).items.map((item: ChechListItem, index: number) => (
-              <TouchableOpacity key={index} onPress={() => {
-              }}>
-                <Text style={styles.text}>{item.text}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        );
-      default:
-        return null;
-    }
-  };
-
 }
 
 
@@ -279,6 +237,9 @@ const dynamicStyles = (isDark = false) => {
       fontSize: 20,
       width: "100%",
       color: isDark ? "#F5F5F5" : "#494949"
+    },
+    deleteBtn: {
+      color: isDark ? "#F5F5F5" : "#131313"
     }
   });
 };

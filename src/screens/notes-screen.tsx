@@ -1,14 +1,15 @@
 import React, { Component } from "react";
 import {
+  Animated,
+  Appearance,
+  ColorSchemeName,
   Image,
+  NativeEventSubscription,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  Animated,
-  Appearance,
-  ColorSchemeName,
+  View
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -19,65 +20,67 @@ import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import Value = Animated.Value;
 
 type User = FirebaseAuthTypes.UserInfo;
-class NotesScreen extends Component<
-  { navigation: any },
-  {
-    isModalVisible: boolean;
-    user?: User;
-    loading: boolean;
-    selectedFilter?: string;
-    viewHeight: Value;
-    isCollapsed: boolean;
-    colorScheme: ColorSchemeName;
-  }
-  > {
-  // ...
-  colorSchemeSubscription;
-  unsubscribeAuth;
-  prevScrollY
-  scrollY
+
+interface State {
+  isModalVisible: boolean;
+  user?: User;
+  loading: boolean;
+  selectedFilter?: string;
+  viewHeight: Value;
+  isCollapsed: boolean;
+  colorScheme: ColorSchemeName;
+}
+
+interface Props {
+  navigation: any;
+}
+
+class NotesScreen extends Component<Props, State> {
+  colorSchemeSubscription!: NativeEventSubscription;
+  unsubscribeAuth!: () => void;
+  prevScrollY;
+  scrollY;
   debounceTimeout: any;
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       isModalVisible: false, loading: true,
       viewHeight: new Animated.Value(160), // Replace 100 with the initial height of your view
       isCollapsed: false,
-      colorScheme: Appearance.getColorScheme(),
+      colorScheme: Appearance.getColorScheme()
     };
     this.scrollY = new Animated.Value(0);
     this.prevScrollY = new Animated.Value(0);
 
   }
+
   toggleCollapse = () => {
     const { isCollapsed, viewHeight } = this.state;
-    const initialHeight = 160; // Replace 100 with the initial height of your view
+    const initialHeight = 160;
     const collapsedHeight = 0;
 
-    // Start the animation
     Animated.timing(viewHeight, {
       toValue: isCollapsed ? initialHeight : collapsedHeight,
       duration: 300,
-      useNativeDriver: false,
+      useNativeDriver: false
     }).start();
 
-    // Update the isCollapsed state
     this.setState({ isCollapsed: !isCollapsed });
   };
-  handleScroll = (event) => {
+  handleScroll = (event: { nativeEvent: { contentOffset: { y: any; }; }; }) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
-    const collapseTogglePoint=30
-    console.log('currentScrollY',currentScrollY)
+    const collapseTogglePoint = 30;
+    console.log("currentScrollY", currentScrollY);
     clearTimeout(this.debounceTimeout);
     this.debounceTimeout = setTimeout(() => {
       if (currentScrollY > collapseTogglePoint && !this.state.isCollapsed) {
         this.toggleCollapse();
-      } else if (currentScrollY < collapseTogglePoint&& this.state.isCollapsed) {
+      } else if (currentScrollY < collapseTogglePoint && this.state.isCollapsed) {
         this.toggleCollapse();
       }
       this.prevScrollY = currentScrollY;
-    }, 5); // 200 ms debounce time, adjust as needed
+    }, 5);
   };
 
   toggleModal = () => {
@@ -126,11 +129,11 @@ class NotesScreen extends Component<
         </View>
 
         {/*{ height: this.state.viewHeight }*/}
-        <Animated.View style={[styles.mainSectionWrapper,{ height: this.state.viewHeight }]}>
+        <Animated.View style={[styles.mainSectionWrapper, { height: this.state.viewHeight }]}>
           <View style={styles.yourNotesWrapper}>
 
-        <Text style={styles.yourTitle}>your</Text>
-        <Text style={styles.notesTitle}>notes</Text>
+            <Text style={styles.yourTitle}>your</Text>
+            <Text style={styles.notesTitle}>notes</Text>
           </View>
 
           <Text style={styles.notesCount}>/14</Text>
@@ -141,20 +144,20 @@ class NotesScreen extends Component<
             <TouchableOpacity style={styles.filterButton}>
               <Text style={styles.filterButtonText}>#side hustle</Text>
             </TouchableOpacity>
-          <TouchableOpacity style={[styles.filterButton,styles.filterSelected]}>
-            <Text style={[styles.filterButtonText,styles.selectedFilterButtonText]}>#personal</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={[styles.filterButtonText]}>#work</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterButtonText}>#home</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={[styles.filterButton, styles.filterSelected]}>
+              <Text style={[styles.filterButtonText, styles.selectedFilterButtonText]}>#personal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={[styles.filterButtonText]}>#work</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={styles.filterButtonText}>#home</Text>
+            </TouchableOpacity>
           </ScrollView>
         </View>
 
-          <NotesListComponent {...this.props}       onScroll={this.handleScroll}
-          />
+        <NotesListComponent {...this.props} onScroll={this.handleScroll}
+        />
         <Modal
           isVisible={this.state.isModalVisible}
           onBackdropPress={this.toggleModal}
@@ -183,7 +186,7 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
       width: "100%",
       backgroundColor: isDark ? "#131313" : "transparent",
       paddingTop: 60,
-      paddingHorizontal: 20,
+      paddingHorizontal: 20
     },
     header: {
       flexDirection: "row",
@@ -192,51 +195,51 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
       width: "100%",
       borderBottomWidth: 1,
       borderBottomColor: isDark ? "#F5F5F5" : "#333333",
-      paddingBottom: 20,
+      paddingBottom: 20
     },
     headerInner: {
       flexDirection: "row",
       justifyContent: "space-around",
-      alignItems: "center",
+      alignItems: "center"
     },
     profilePicture: {
       width: 40,
       height: 40,
       borderRadius: 25,
-      marginHorizontal: 10,
+      marginHorizontal: 10
     },
     mutedText: {
-      color: isDark ? "#999" : "#666666",
+      color: isDark ? "#999" : "#666666"
     },
     username: {
-      color: isDark ? "#F5F5F5" : "#333333",
+      color: isDark ? "#F5F5F5" : "#333333"
     },
     recordButton: {
       justifyContent: "center",
       alignItems: "center",
-      marginRight: 10,
+      marginRight: 10
     }, recordButtonIcon: {
-      color: isDark ? "#F5F5F5" : "#333333",
+      color: isDark ? "#F5F5F5" : "#333333"
     },
     yourTitle: {
       color: isDark ? "#F5F5F5" : "#333333",
       maxWidth: 400,
       fontSize: 70,
       fontWeight: "400",
-      paddingLeft: 20,
+      paddingLeft: 20
     },
     notesTitle: {
       color: isDark ? "#F5F5F5" : "#333333",
       maxWidth: 400,
       fontSize: 70,
       fontWeight: "400",
-      paddingLeft: 40,
+      paddingLeft: 40
     },
     notesCount: {
       color: isDark ? "#bbb" : "#555555",
       fontSize: 46.6,
       fontWeight: "500",
-      marginBottom: 10,
+      marginBottom: 10
     },
     filterContainer: {
       flexDirection: "row",
@@ -245,7 +248,7 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
       width: "100%",
       borderColor: isDark ? "#f5f5f5" : "#333333",
       paddingVertical: 30,
-      borderBottomWidth: 1,
+      borderBottomWidth: 1
     },
     filterButton: {
       borderWidth: 1,
@@ -253,44 +256,44 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
       borderRadius: 100,
       padding: 15,
       paddingHorizontal: 15,
-      marginLeft: 10,
+      marginLeft: 10
     },
     filterSelected: {
       borderColor: "#FE6902",
       backgroundColor: "#FE6902",
-      color: isDark ? "#fff" : "#333333",
+      color: isDark ? "#fff" : "#333333"
 
     },
 
     filterButtonText: {
       color: isDark ? "#F5F5F5" : "#333333",
-      fontSize: 20,
+      fontSize: 20
     },
     selectedFilterButtonText: {
 
-      color: isDark ? "#131313" : "#f5f5f5",
+      color: isDark ? "#131313" : "#f5f5f5"
 
     },
     modal: {
       justifyContent: "flex-end",
-      margin: 0,
+      margin: 0
     },
     modalContent: {
       borderTopLeftRadius: 12,
       borderTopRightRadius: 12,
       paddingTop: 20,
-      height: "50%",
+      height: "50%"
     },
     mainSectionWrapper: {
       width: "100%",
       justifyContent: "space-between",
       flexDirection: "row",
-      alignItems: "flex-end",
+      alignItems: "flex-end"
     },
     yourNotesWrapper: {},
     bottomSection: {
       borderTopWidth: 1,
-      borderColor: isDark ? "#ccc" : "#555555",
+      borderColor: isDark ? "#ccc" : "#555555"
     }
 
   });

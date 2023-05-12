@@ -1,4 +1,4 @@
-import { Entry } from "./recording";
+import { Entry } from "./entry";
 
 export interface User {
     uid: string;
