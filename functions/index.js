@@ -64,7 +64,7 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       .doc(fileId)
       .update({
         title: splitText.slice(0, 3).join(' '),
-        blocks: [{ type: 'TextBlock', block: { text: json.text } }],
+        text: json.text,
         status: 'done',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
