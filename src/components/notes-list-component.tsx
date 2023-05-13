@@ -177,7 +177,7 @@ const dynamicStyles = (colorScheme:ColorSchemeName) => {
       color: isDark ? "#F5F5F5" : "#131313",
       right: 0,
       top: 0,
-    },
+    }
   });
 };
 

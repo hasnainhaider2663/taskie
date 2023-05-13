@@ -166,7 +166,7 @@ class NotesScreen extends Component<Props, State> {
           propagateSwipe
           style={styles.modal}>
           <View style={styles.modalContent}>
-            <AudioRecorder />
+            <AudioRecorder user={this.state.user} />
           </View>
         </Modal>
       </View>

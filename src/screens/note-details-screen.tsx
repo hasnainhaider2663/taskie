@@ -11,11 +11,12 @@ import {
   TouchableWithoutFeedback,
   View
 } from "react-native";
-import firestore from "@react-native-firebase/firestore";
+import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import BackButton from "../components/back-button";
 import EditTextControls from "../components/edit-text-controls";
 import { Entry } from "../models/entry";
+import AudioRecorder from "../components/recorder";
 
 type Props = {
   route: {
@@ -31,6 +32,7 @@ type State = {
   isLoading: boolean;
   user?: any;
   isDark?: boolean;
+  entryRef?:any
 };
 
 class NoteDetailsScreen extends Component<Props, State> {
@@ -39,6 +41,7 @@ class NoteDetailsScreen extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       entry: undefined,
       isLoading: true,
@@ -48,15 +51,17 @@ class NoteDetailsScreen extends Component<Props, State> {
 
 
   render() {
-    const { isLoading, entry, isDark } = this.state;
+    const { isLoading, entry, isDark,entryRef } = this.state;
     const styles = dynamicStyles(isDark);
-    if (isLoading || !entry) {
+    if (isLoading || !entry|| !entryRef) {
       return (
         <View style={styles.container}>
           <Text>Loading...</Text>
         </View>
       );
     }
+
+    console.log(this.state)
 
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -91,8 +96,10 @@ class NoteDetailsScreen extends Component<Props, State> {
             />
 
           </View>
-
-          <EditTextControls />
+          <View style={styles.audioRecorderContainer}>
+          <AudioRecorder user={this.state.user} firebasePath={this.state.entryRef.id} embedded={true} />
+          </View>
+          {/*<EditTextControls />*/}
         </View>
       </TouchableWithoutFeedback>
     );
@@ -101,7 +108,14 @@ class NoteDetailsScreen extends Component<Props, State> {
   componentDidMount(): void {
 
     this.unsubscribeAuth = auth().onAuthStateChanged(async user => {
-      this.setState({ user });
+      if(!user)
+        return
+      const { entryId } = this.props.route.params;
+      const entryRef = firestore().collection("users").doc(user.uid).collection("entries").doc(entryId);
+
+      this.setState({ user,entryRef });
+      console.log(this.state)
+      console.log('path',this.state.entryRef.path)
       await this.fetchEntry();
     });
     this.colorSchemeSubscription = Appearance.addChangeListener(({ colorScheme }) => {
@@ -119,11 +133,9 @@ class NoteDetailsScreen extends Component<Props, State> {
   }
 
   async fetchEntry() {
-    const { entryId } = this.props.route.params;
 
     try {
-      const entryRef = firestore().collection("users").doc(this.state.user.uid).collection("entries").doc(entryId);
-      entryRef.onSnapshot(entryDoc => {
+      this.state.entryRef.onSnapshot(entryDoc => {
         if (entryDoc.exists) {
           this.setState({
             entry: entryDoc.data() as Entry,
@@ -201,6 +213,12 @@ const dynamicStyles = (isDark = false) => {
       paddingTop: 70,
       paddingHorizontal: 20,
       backgroundColor: isDark ? "#131313" : "#F5F5F5"
+    },
+    audioRecorderContainer: {
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+
     },
     headerContainer: {
       flexDirection: "row",

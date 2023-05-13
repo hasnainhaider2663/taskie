@@ -12,9 +12,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import NoteDetailsScreen from './src/screens/note-details-screen';
 import {View, StyleSheet} from 'react-native';
-import TasksListScreen from "./src/screens/tasks-screen";
-import DashboardScreen from "./src/screens/dashboard";
-import TaskListDetailsScreen from "./src/screens/task-list-details-screen";
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 const Tab = createBottomTabNavigator();
@@ -57,14 +54,7 @@ function TabMenu() {
   </Tab.Navigator>
   );
 }
-function TasksListWrapper() {
-  return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Tab.Screen name="TasksListScreen" component={TasksListScreen} />
-      <Stack.Screen name="TaskListDetails" component={TaskListDetailsScreen} />
-    </Stack.Navigator>
-  );
-}
+
 function NotesWrapper() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>

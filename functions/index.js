@@ -26,6 +26,8 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
     const filePath = object.name;
     const bucket = storage.bucket(fileBucket);
     const file = bucket.file(filePath);
+    const parentFolder = path.dirname(filePath);
+
     const [metadata] = await file.getMetadata();
     const storageStream = file.createReadStream();
     console.log('meta', JSON.stringify(await file.getMetadata()))
@@ -49,22 +51,35 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
     };
     const res = await fetch(OPENAI_API_URL, fetchOptions);
     const json = await res.json();
-    const fileId = path.parse(filePath).name.split('/')[path.parse(filePath).name.split('/').length - 1];
+    const fileId = path.parse(parentFolder).name.split('/')[path.parse(filePath).name.split('/').length - 1];
     const userUid = fileId.split('_')[0];
     console.log('Transcription:', JSON.stringify(json));
     console.log('fileId:', fileId);
     console.log('user', userUid)
 
     const splitText=json.text.split(' ')
-    // Save the transcript to the "entries" table in Firestore
-    await db
+    const firebaseDocument=db
       .collection('users')
       .doc(userUid)
       .collection('entries')
       .doc(fileId)
+
+    const data= (await firebaseDocument.get()).data()
+    let title= data.title
+
+    if(!data.text){
+      data.text=''
+      title= splitText.slice(0, 3).join(' ')
+    }
+    console.log('data--',data)
+    const newText= data.text+'\n'+json.text
+    console.log('newText--',newText)
+
+    // Save the transcript to the "entries" table in Firestore
+    await firebaseDocument
       .update({
-        title: splitText.slice(0, 3).join(' '),
-        text: json.text,
+        title,
+        text: newText,
         status: 'done',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });

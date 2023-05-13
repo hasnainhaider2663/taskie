@@ -8,36 +8,49 @@ import AudioRecorderPlayer, {
   AVModeIOSOption
 } from "react-native-audio-recorder-player";
 import RNFS from "react-native-fs";
-import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import uploadAudio from "../helpers/upload-audio";
 import Icon from "react-native-vector-icons/Ionicons";
+import StatusMessages from "../models/StatusMessages";
 
 const { width } = Dimensions.get("window");
 type State = {
   isRecording: boolean;
   isPlaying: boolean;
   audioPath: string;
-  filename: string;
+  firebaseFileName: string;
   user?: any;
   firebasePath?: string;
   doc?: any;
   scale: any;
+  timestamp:any;
 };
+interface Props{
 
-class AudioRecorder extends Component<{}, State> {
+  firebasePath?:string;
+  user:any;
+  embedded?:boolean;
+}
+class AudioRecorder extends Component<Props, State> {
   unsubscribeAuth: any;
   private audioRecorderPlayer: AudioRecorderPlayer;
 
-  constructor(props: {}) {
+  constructor(props: Props) {
     super(props);
+
+    const timestamp = new Date().getTime();
+    const firebasePath =this.props.firebasePath|| `${this.props.user.uid}_${timestamp}`;
+    const firebaseFileName = `${firebasePath}/${timestamp}.m4a`;
+    console.log('fb0',firebasePath)
     this.state = {
       isRecording: false,
       isPlaying: false,
       audioPath: "abc.m4a",
-      filename: "abc.m4a",
-      doc: { text: `Hello!` },
-      scale: new Animated.Value(1)
+      firebasePath,
+      firebaseFileName,
+      doc: { status: StatusMessages.INITIAL },
+      scale: new Animated.Value(1),
+      timestamp,user:this.props.user
     };
     this.audioRecorderPlayer = new AudioRecorderPlayer();
   }
@@ -84,9 +97,10 @@ class AudioRecorder extends Component<{}, State> {
     };
     return (
       <View style={styles.container}>
-        <View style={styles.mainContainer}>
-          <Text style={styles.docText}>{this.state.doc?.text}</Text>
-        </View>
+        {!this.props.embedded &&<View style={styles.mainContainer}>
+          <Text
+            style={styles.docText}>{this.state.doc.status !== StatusMessages.DONE ? this.state.doc.status : this.state.doc?.text}</Text>
+        </View>}
         <View style={styles.outerButtonContainer}>
           <View style={styles.buttonContainer}>
             <Animated.View style={[styles.buttonShadow, animatedStyle]}>
@@ -107,46 +121,25 @@ class AudioRecorder extends Component<{}, State> {
     );
   }
 
-  componentDidMount(): void {
-    // Check if user is logged in
-    this.unsubscribeAuth = auth().onAuthStateChanged(user => {
-      console.log("----");
-      console.log("auth state changed");
-
-      if (user) {
-        this.setState({
-          user,
-          doc: {
-            text: `Hold the mic to start speaking and release to save your note.`
-          }
-        });
-      } else {
-        this.setState({ user });
-      }
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribeAuth();
-  }
-
   startRecording = async () => {
     this.setState({ isRecording: true });
-    const timestamp = new Date().getTime();
-    const firebasePath = `${this.state.user.uid}_audioFile_${timestamp}`;
-    const uniqueFilename = firebasePath + ".m4a";
-    this.setState({ filename: uniqueFilename, firebasePath });
 
     const fireStoreCollection = firestore()
       .collection("users")
       .doc(this.state.user.uid)
       .collection("entries");
-    const firestoreDoc = fireStoreCollection.doc(firebasePath);
-    await firestoreDoc.set({
-      id: firebasePath,
-      status: "loading",
-      text: "listening..."
-    });
+    const firestoreDoc = fireStoreCollection.doc(this.state.firebasePath);
+    if(this.props.embedded){
+      await firestoreDoc.update({
+        status:StatusMessages.LISTENING
+      });
+    }else{
+      await firestoreDoc.set({
+        id: this.state.firebasePath,
+        status:StatusMessages.LISTENING
+      });
+    }
+
     firestoreDoc.onSnapshot(documentSnapshot => {
       if (documentSnapshot.exists) {
         const data = documentSnapshot.data();
@@ -164,7 +157,7 @@ class AudioRecorder extends Component<{}, State> {
 
     // Set the path for the audio file
     const result = await this.audioRecorderPlayer.startRecorder(
-      this.state.filename,
+      undefined,
       audioSet
     );
     this.audioRecorderPlayer.addRecordBackListener((e: any) => {
@@ -181,17 +174,17 @@ class AudioRecorder extends Component<{}, State> {
       .collection("entries");
     const firestoreDoc = fireStoreCollection.doc(this.state.firebasePath);
     await firestoreDoc.update({
-      text: "Loading..."
+      status: StatusMessages.UPLOADING
     });
     this.setState({ isRecording: false, audioPath: result }, async () => {
       await uploadAudio(
         this.state.audioPath,
-        this.state.filename,
+        this.state.firebaseFileName,
         this.state.user.uid
       ); // Call the uploadAudio function after updating the state
 
 
-      await firestoreDoc.update({ text: "Thinking about what you said..." });
+      await firestoreDoc.update({ status: StatusMessages.PROCESSING });
     });
   };
 }
