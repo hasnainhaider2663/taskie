@@ -166,7 +166,7 @@ class NotesScreen extends Component<Props, State> {
           propagateSwipe
           style={styles.modal}>
           <View style={styles.modalContent}>
-            <AudioRecorder user={this.state.user} />
+            <AudioRecorder user={this.state.user} isDark={this.state.colorScheme==='dark'} />
           </View>
         </Modal>
       </View>

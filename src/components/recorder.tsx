@@ -30,6 +30,8 @@ interface Props{
   firebasePath?:string;
   user:any;
   embedded?:boolean;
+  isDark?:boolean;
+
 }
 class AudioRecorder extends Component<Props, State> {
   unsubscribeAuth: any;
@@ -95,6 +97,7 @@ class AudioRecorder extends Component<Props, State> {
     const animatedStyle = {
       transform: [{ scale: this.state.scale }]
     };
+    const styles= dynamicStyles(this.props.isDark)
     return (
       <View style={styles.container}>
         {!this.props.embedded &&<View style={styles.mainContainer}>
@@ -192,7 +195,8 @@ class AudioRecorder extends Component<Props, State> {
 // Styles and other functions...
 
 
-const styles = StyleSheet.create({
+const dynamicStyles = (isDark = false) => {
+  return StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-end",
@@ -283,6 +287,7 @@ const styles = StyleSheet.create({
   }, icon: { color: "#131313" }
 
 });
+};
 
 const readFile = async (path: string, encoding: string): Promise<string> => {
   return await RNFS.readFile(path, encoding);

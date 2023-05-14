@@ -66,6 +66,7 @@ class NoteDetailsScreen extends Component<Props, State> {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
+        <View style={styles.Wrapper}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <BackButton isDark={!!this.state.isDark} />
@@ -96,10 +97,13 @@ class NoteDetailsScreen extends Component<Props, State> {
             />
 
           </View>
-          <View style={styles.audioRecorderContainer}>
-          <AudioRecorder user={this.state.user} firebasePath={this.state.entryRef.id} embedded={true} />
-          </View>
+
           {/*<EditTextControls />*/}
+        </View>
+          <View style={styles.audioRecorderContainer}>
+            <AudioRecorder user={this.state.user} firebasePath={this.state.entryRef.id} embedded={true}
+            isDark={this.state.isDark}/>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -208,11 +212,15 @@ class NoteDetailsScreen extends Component<Props, State> {
 
 const dynamicStyles = (isDark = false) => {
   return StyleSheet.create({
-    container: {
+
+    Wrapper: {
       flex: 1,
       paddingTop: 70,
-      paddingHorizontal: 20,
       backgroundColor: isDark ? "#131313" : "#F5F5F5"
+    },
+    container: {
+      flex: 1,
+      paddingHorizontal: 20,
     },
     audioRecorderContainer: {
       position: 'absolute',
