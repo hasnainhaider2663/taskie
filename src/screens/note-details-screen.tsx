@@ -32,7 +32,7 @@ type State = {
   isLoading: boolean;
   user?: any;
   isDark?: boolean;
-  entryRef?:any
+  entryRef?:FirebaseFirestoreTypes.DocumentReference
 };
 
 class NoteDetailsScreen extends Component<Props, State> {
@@ -93,7 +93,7 @@ class NoteDetailsScreen extends Component<Props, State> {
               inputMode="text"
               onChangeText={text => this.handleInputChange(text)}
               onBlur={() => this.saveChanges(entry)}
-              returnKeyType={"done"}
+              returnKeyType={"done"}  onSelectionChange={this.handleSelectionChange}
             />
 
           </View>
@@ -177,12 +177,7 @@ class NoteDetailsScreen extends Component<Props, State> {
     const { entryId } = this.props.route.params;
 
     try {
-      await firestore()
-        .collection("users")
-        .doc(this.state.user.uid)
-        .collection("entries")
-        .doc(entryId)
-        .delete();
+      await this.state.entryRef.delete();
 
       // Go back to the previous screen after deleting the entry
       this.props.navigation.goBack();
@@ -190,15 +185,22 @@ class NoteDetailsScreen extends Component<Props, State> {
       console.error("Error deleting entry: ", error);
     }
   }
+  handleSelectionChange = ({ nativeEvent: { selection } }) => {
+    const { entry } = this.state;
+    if(!entry)return
+    console.log('selection',selection)
+    entry.selection= selection
+    this.setState({ entry });
+    this.state.entryRef?.update(entry)
+  };
+
 
   handleInputChange(text: string) {
-    // Update the text of the TextBlock
-    // (blockItem.block as TextBlock).text = text;
+
     if (!this.state.entry)
       return;
     let entry = this.state.entry;
     entry.text = text;
-
     this.setState({ entry });
     console.log(this.state.entry);
 

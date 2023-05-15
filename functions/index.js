@@ -64,18 +64,30 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       .collection('entries')
       .doc(fileId)
 
-    const data= (await firebaseDocument.get()).data()
-    let title= data.title
+    const data = (await firebaseDocument.get()).data();
+    let title = data.title;
 
-    if(!data.text){
-      data.text=''
-      title= splitText.slice(0, 3).join(' ')
+    if (!data.text) {
+      data.text = '';
+      title = splitText.slice(0, 3).join(' ');
     }
-    console.log('data--',data)
-    const newText= data.text+'\n'+json.text
-    console.log('newText--',newText)
 
-    // Save the transcript to the "entries" table in Firestore
+    console.log('data--', data);
+
+// Get the selection start and end
+    const selectionStart = data.selection.start;
+    const selectionEnd = data.selection.end;
+
+// Cut the original text into two parts: before the selection and after the selection
+    const textBeforeSelection = data.text.slice(0, selectionStart);
+    const textAfterSelection = data.text.slice(selectionEnd);
+
+// Insert the new text in between these two parts
+    const newText = textBeforeSelection + json.text + textAfterSelection;
+
+    console.log('newText--', newText);
+
+// Save the transcript to the "entries" table in Firestore
     await firebaseDocument
       .update({
         title,
