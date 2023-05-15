@@ -201,10 +201,12 @@ const dynamicStyles = (isDark = false) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: "flex-end",
+      justifyContent: "space-between",
       alignItems: "center",
+      width: "100%",
+      paddingHorizontal: 20, // Add some padding if needed
+      paddingTop: "100%", // Add some padding if needed
       backgroundColor: isDark ? "rgba(0, 0, 0, 0.7)" : "rgba(236, 239, 241, 0.7)",
-      width: "100%"
     },
     outerButtonContainer: {
       // backgroundColor: isDark ? "#000" : "#ECEFF1",
@@ -213,7 +215,7 @@ const dynamicStyles = (isDark = false) => {
     },
     mainContainer: {
       marginBottom: 50,
-      alignItems: "center"
+      alignItems: "center",
     },
     playbackContainer: {
       alignItems: "center"
@@ -225,17 +227,16 @@ const dynamicStyles = (isDark = false) => {
     },
 
     docText: {
-      fontSize: 26,
+      fontSize: 48,
       color: isDark ? "#f5f5f5" : "#131313",
       fontFamily: Platform.OS === "ios" ? "Helvetica" : "Roboto",
       fontStyle: "normal",
-      fontWeight: "200",
+      fontWeight: "100",
       letterSpacing: 0.6,
-      lineHeight: 24,
       textAlign: "center",
       maxWidth: "90%",
       shadowColor: isDark ? "#f5f5f5" : "#131313",
-      shadowOffset: { width: 0, height: 1 },
+      shadowOffset: { width: 1, height: 1 },
       shadowOpacity: 0.1,
       shadowRadius: 3,
       elevation: 2

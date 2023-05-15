@@ -229,7 +229,6 @@ const dynamicStyles = (isDark = false) => {
       position: 'absolute',
       bottom: 0,
       width: '100%',
-
     },
     headerContainer: {
       flexDirection: "row",
