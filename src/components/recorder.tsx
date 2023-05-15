@@ -203,7 +203,7 @@ const dynamicStyles = (isDark = false) => {
       flex: 1,
       justifyContent: "flex-end",
       alignItems: "center",
-      // backgroundColor: isDark ? "#000" : "#ECEFF1",
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.7)" : "rgba(236, 239, 241, 0.7)",
       width: "100%"
     },
     outerButtonContainer: {

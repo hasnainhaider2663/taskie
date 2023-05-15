@@ -281,7 +281,7 @@ const dynamicStyles = (colorScheme: ColorSchemeName) => {
     modalContent: {
       borderTopLeftRadius: 12,
       borderTopRightRadius: 12,
-      height: "30%"
+      height: "100%"
     },
     mainSectionWrapper: {
       width: "100%",
