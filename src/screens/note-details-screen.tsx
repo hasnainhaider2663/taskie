@@ -94,6 +94,7 @@ class NoteDetailsScreen extends Component<Props, State> {
               onChangeText={text => this.handleInputChange(text)}
               onBlur={() => this.saveChanges(entry)}
               returnKeyType={"done"}  onSelectionChange={this.handleSelectionChange}
+              showSoftInputOnFocus={false}
             />
 
           </View>
@@ -101,7 +102,7 @@ class NoteDetailsScreen extends Component<Props, State> {
           {/*<EditTextControls />*/}
         </View>
           <View style={styles.audioRecorderContainer}>
-            <AudioRecorder user={this.state.user} firebasePath={this.state.entryRef.id} embedded={true}
+            <AudioRecorder user={this.state.user} firebasePath={this.state.entryRef?.id} embedded={true}
             isDark={this.state.isDark}/>
           </View>
         </View>
@@ -119,7 +120,7 @@ class NoteDetailsScreen extends Component<Props, State> {
 
       this.setState({ user,entryRef });
       console.log(this.state)
-      console.log('path',this.state.entryRef.path)
+      console.log('path',this.state.entryRef?.path)
       await this.fetchEntry();
     });
     this.colorSchemeSubscription = Appearance.addChangeListener(({ colorScheme }) => {
@@ -139,7 +140,7 @@ class NoteDetailsScreen extends Component<Props, State> {
   async fetchEntry() {
 
     try {
-      this.state.entryRef.onSnapshot(entryDoc => {
+      this.state.entryRef?.onSnapshot(entryDoc => {
         if (entryDoc.exists) {
           this.setState({
             entry: entryDoc.data() as Entry,
@@ -177,7 +178,7 @@ class NoteDetailsScreen extends Component<Props, State> {
     const { entryId } = this.props.route.params;
 
     try {
-      await this.state.entryRef.delete();
+      await this.state.entryRef?.delete();
 
       // Go back to the previous screen after deleting the entry
       this.props.navigation.goBack();

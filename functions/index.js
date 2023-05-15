@@ -74,16 +74,24 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
 
     console.log('data--', data);
 
-// Get the selection start and end
-    const selectionStart = data.selection.start;
-    const selectionEnd = data.selection.end;
+    let newText;
 
-// Cut the original text into two parts: before the selection and after the selection
-    const textBeforeSelection = data.text.slice(0, selectionStart);
-    const textAfterSelection = data.text.slice(selectionEnd);
+// Check if the selection is defined
+    if (data.selection) {
+      // Get the selection start and end
+      const selectionStart = data.selection.start;
+      const selectionEnd = data.selection.end;
 
-// Insert the new text in between these two parts
-    const newText = textBeforeSelection + json.text + textAfterSelection;
+      // Cut the original text into two parts: before the selection and after the selection
+      const textBeforeSelection = data.text.slice(0, selectionStart);
+      const textAfterSelection = data.text.slice(selectionEnd);
+
+      // Insert the new text in between these two parts
+      newText = textBeforeSelection + json.text + textAfterSelection;
+    } else {
+      // If the selection is not defined, append the new text to the end of the existing text
+      newText = data.text + '\n' + json.text;
+    }
 
     console.log('newText--', newText);
 
@@ -95,6 +103,7 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
         status: 'done',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
+
   } catch (error) {
     console.error('Error:', error);
   }
