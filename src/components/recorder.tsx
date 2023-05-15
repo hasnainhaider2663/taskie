@@ -205,7 +205,6 @@ const dynamicStyles = (isDark = false) => {
       alignItems: "center",
       width: "100%",
       paddingHorizontal: 20, // Add some padding if needed
-      paddingTop: "100%", // Add some padding if needed
       backgroundColor: isDark ? "rgba(0, 0, 0, 0.7)" : "rgba(236, 239, 241, 0.7)",
     },
     outerButtonContainer: {
@@ -227,6 +226,7 @@ const dynamicStyles = (isDark = false) => {
     },
 
     docText: {
+      paddingTop: "100%", // Add some padding if needed
       fontSize: 48,
       color: isDark ? "#f5f5f5" : "#131313",
       fontFamily: Platform.OS === "ios" ? "Helvetica" : "Roboto",
