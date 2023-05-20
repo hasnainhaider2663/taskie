@@ -17,7 +17,7 @@ import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firest
 import auth from "@react-native-firebase/auth";
 import BackButton from "../components/back-button";
 import { Entry } from "../models/entry";
-import SpeechRecognizer from "../components/speech-recognizer";
+import Whisper from "../components/whisper";
 
 type Props = {
   route: {
@@ -106,7 +106,7 @@ class NoteDetailsScreen extends Component<Props, State> {
               {/*<EditTextControls />*/}
             </View>
             <View style={styles.audioRecorderContainer}>
-              <SpeechRecognizer user={this.state.user} embedded={true}
+              <Whisper user={this.state.user} embedded={true}
                                 isDark={this.state.isDark}
                                 onSpeechResult={text => this.handleSpeechResult(text)}
               />
@@ -119,6 +119,7 @@ class NoteDetailsScreen extends Component<Props, State> {
   }
 
   handleSpeechResult = (text: string) => {
+    console.log('whispered!!!',text)
     let newText = "";
 
     if (!this.state.entry)

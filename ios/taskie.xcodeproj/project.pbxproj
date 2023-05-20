@@ -14,6 +14,7 @@
 		3B8F980F710F11EBD4BCB24A /* libPods-taskie.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD3443E72B949987CCFCB350 /* libPods-taskie.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		E36E209170008B1B56AAC061 /* libPods-taskie-taskieTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 743D571167B9C986E2638D51 /* libPods-taskie-taskieTests.a */; };
+		EE59DF8F2A19294200B8BDFA /* ggml-tiny.bin in Resources */ = {isa = PBXBuildFile; fileRef = EE59DF8E2A19294200B8BDFA /* ggml-tiny.bin */; };
 		EEB1E68A29FAB351001B2228 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EEB1E68929FAB351001B2228 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		C619481BC4B7B54C840EC62D /* Pods-taskie.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskie.release.xcconfig"; path = "Target Support Files/Pods-taskie/Pods-taskie.release.xcconfig"; sourceTree = "<group>"; };
 		D3E767B60EF3C219A415DCB8 /* Pods-taskie-taskieTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskie-taskieTests.debug.xcconfig"; path = "Target Support Files/Pods-taskie-taskieTests/Pods-taskie-taskieTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		EE59DF8E2A19294200B8BDFA /* ggml-tiny.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = "ggml-tiny.bin"; sourceTree = "<group>"; };
 		EEB1E68929FAB351001B2228 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FD3443E72B949987CCFCB350 /* libPods-taskie.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-taskie.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -88,6 +90,7 @@
 		13B07FAE1A68108700A75B9A /* taskie */ = {
 			isa = PBXGroup;
 			children = (
+				EE59DF8E2A19294200B8BDFA /* ggml-tiny.bin */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -246,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE59DF8F2A19294200B8BDFA /* ggml-tiny.bin in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				EEB1E68A29FAB351001B2228 /* GoogleService-Info.plist in Resources */,
