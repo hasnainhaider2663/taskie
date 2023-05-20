@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Animated, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import StatusMessages from "../models/StatusMessages";
 import Voice from "@react-native-voice/voice";
 import { check, PERMISSIONS, request, RESULTS } from "react-native-permissions";
 
