@@ -17,7 +17,6 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/audio/transcriptions';
 const OPENAI_API_KEY = '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';
 exports.processAudio = functions.storage.object().onFinalize(async object => {
   if (!object.contentType.startsWith('audio/')) {
-    console.log('Not an audio file.');
     return;
   }
 
@@ -30,7 +29,6 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
 
     const [metadata] = await file.getMetadata();
     const storageStream = file.createReadStream();
-    console.log('meta', JSON.stringify(await file.getMetadata()))
     // Access the user's UID from the custom metadata
 
     const formData = new FormData();
@@ -53,9 +51,6 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
     const json = await res.json();
     const fileId = path.parse(parentFolder).name.split('/')[path.parse(filePath).name.split('/').length - 1];
     const userUid = fileId.split('_')[0];
-    console.log('Transcription:', JSON.stringify(json));
-    console.log('fileId:', fileId);
-    console.log('user', userUid)
 
     const splitText=json.text.split(' ')
     const firebaseDocument=db
@@ -71,8 +66,6 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       data.text = '';
       title = splitText.slice(0, 3).join(' ');
     }
-
-    console.log('data--', data);
 
     let newText;
 
@@ -92,8 +85,6 @@ exports.processAudio = functions.storage.object().onFinalize(async object => {
       // If the selection is not defined, append the new text to the end of the existing text
       newText = data.text + '\n' + json.text;
     }
-
-    console.log('newText--', newText);
 
 // Save the transcript to the "entries" table in Firestore
     await firebaseDocument

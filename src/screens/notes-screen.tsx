@@ -71,7 +71,6 @@ class NotesScreen extends Component<Props, State> {
   handleScroll = (event: { nativeEvent: { contentOffset: { y: any; }; }; }) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
     const collapseTogglePoint = 30;
-    console.log("currentScrollY", currentScrollY);
     clearTimeout(this.debounceTimeout);
     this.debounceTimeout = setTimeout(() => {
       if (currentScrollY > collapseTogglePoint && !this.state.isCollapsed) {
@@ -89,8 +88,6 @@ class NotesScreen extends Component<Props, State> {
 
   componentDidMount(): void {
     this.unsubscribeAuth = auth().onAuthStateChanged((user: any) => {
-      console.log("----");
-      console.log("auth state changed", user);
       if (user) {
         this.setState({ loading: false, user: (user as User) });
       }
@@ -112,21 +109,21 @@ class NotesScreen extends Component<Props, State> {
     return (
 
       <View style={styles.container}>
-        <View style={styles.header}>
+        {/*<View style={styles.header}>*/}
 
-          <View style={styles.headerInner}>
-            <Image
-              source={{ uri: this.state.user?.photoURL }}
-              style={styles.profilePicture}
-            />
-            <Text style={styles.mutedText}>Welcome,</Text>
-            <Text style={styles.username}>{" " + this.state.user?.displayName?.split(" ")[0]}</Text>
-          </View>
+        {/*  <View style={styles.headerInner}>*/}
+        {/*    <Image*/}
+        {/*      source={{ uri: this.state.user?.photoURL }}*/}
+        {/*      style={styles.profilePicture}*/}
+        {/*    />*/}
+        {/*    <Text style={styles.mutedText}>Welcome,</Text>*/}
+        {/*    <Text style={styles.username}>{" " + this.state.user?.displayName?.split(" ")[0]}</Text>*/}
+        {/*  </View>*/}
 
-          <TouchableOpacity style={styles.recordButton} onPress={this.toggleModal}>
-            <Icon name="add" size={40} style={styles.recordButtonIcon} />
-          </TouchableOpacity>
-        </View>
+        {/*  <TouchableOpacity style={styles.recordButton} onPress={this.toggleModal}>*/}
+        {/*    <Icon name="add" size={40} style={styles.recordButtonIcon} />*/}
+        {/*  </TouchableOpacity>*/}
+        {/*</View>*/}
 
         {/*{ height: this.state.viewHeight }*/}
         <Animated.View style={[styles.mainSectionWrapper, { height: this.state.viewHeight }]}>
@@ -166,7 +163,7 @@ class NotesScreen extends Component<Props, State> {
           propagateSwipe
           style={styles.modal}>
           <View style={styles.modalContent}>
-            <AudioRecorder user={this.state.user} isDark={this.state.colorScheme==='dark'} />
+            {/*<AudioRecorder user={this.state.user} isDark={this.state.colorScheme==='dark'} />*/}
           </View>
         </Modal>
       </View>

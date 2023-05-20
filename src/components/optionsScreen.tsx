@@ -6,7 +6,6 @@ class OptionsScreen extends React.Component<{navigation: any}> {
   render() {
     const handleLogout = async () => {
       // Perform your logout logic here
-      console.log('Logged out');
       await auth().signOut();
       // navigation.navigate('Login');
     };

@@ -95,8 +95,6 @@ class App extends React.Component<
 
   componentDidMount(): void {
     this.unsubscribeAuth = auth().onAuthStateChanged(user => {
-      console.log('----');
-      console.log('auth state changed', user);
       this.setState({loading: false, user});
     });
   }

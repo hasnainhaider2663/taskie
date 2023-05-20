@@ -3,7 +3,9 @@ import {
   Alert,
   Appearance,
   Keyboard,
+  KeyboardAvoidingView,
   NativeEventSubscription,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -14,9 +16,8 @@ import {
 import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import BackButton from "../components/back-button";
-import EditTextControls from "../components/edit-text-controls";
 import { Entry } from "../models/entry";
-import AudioRecorder from "../components/recorder";
+import SpeechRecognizer from "../components/speech-recognizer";
 
 type Props = {
   route: {
@@ -32,12 +33,13 @@ type State = {
   isLoading: boolean;
   user?: any;
   isDark?: boolean;
-  entryRef?:FirebaseFirestoreTypes.DocumentReference
+  entryRef?: FirebaseFirestoreTypes.DocumentReference
 };
 
 class NoteDetailsScreen extends Component<Props, State> {
   unsubscribeAuth?: () => void;
   colorSchemeSubscription?: NativeEventSubscription;
+  debounce;
 
   constructor(props: Props) {
     super(props);
@@ -51,9 +53,9 @@ class NoteDetailsScreen extends Component<Props, State> {
 
 
   render() {
-    const { isLoading, entry, isDark,entryRef } = this.state;
+    const { isLoading, entry, isDark, entryRef } = this.state;
     const styles = dynamicStyles(isDark);
-    if (isLoading || !entry|| !entryRef) {
+    if (isLoading || !entry || !entryRef) {
       return (
         <View style={styles.container}>
           <Text>Loading...</Text>
@@ -61,66 +63,125 @@ class NoteDetailsScreen extends Component<Props, State> {
       );
     }
 
-    console.log(this.state)
 
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
-        <View style={styles.Wrapper}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <BackButton isDark={!!this.state.isDark} />
-            <TouchableOpacity onPress={() => this.showDeleteConfirmation()}>
-              <Text style={[styles.textRight, styles.deleteBtn]}>delete</Text>
-            </TouchableOpacity>
+          <View style={styles.Wrapper}>
+            <View style={styles.container}>
+              <View style={styles.headerContainer}>
+                <BackButton isDark={!!this.state.isDark} />
+                <TouchableOpacity onPress={() => this.showDeleteConfirmation()}>
+                  <Text style={[styles.textRight, styles.deleteBtn]}>delete</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.border} />
+              <View style={styles.textContainer}>
+                <Text style={styles.textLeft}>18/11/22</Text>
+                <TouchableOpacity>
+                  <Text style={styles.textRight}>#work</Text>
+                </TouchableOpacity>
+
+              </View>
+              <Text style={styles.title}>{entry.title}</Text>
+
+              <View style={styles.blockContainer}>
+                <TextInput
+                  style={styles.text}
+                  value={entry.text}
+                  multiline={true}
+                  keyboardAppearance="default"
+                  inputMode="text"
+                  // onChangeText={text => this.handleInputChange(text)}
+                  onBlur={() => this.saveChanges(entry)}
+                  returnKeyType={"done"} onSelectionChange={this.handleSelectionChange}
+                  showSoftInputOnFocus={false}
+                />
+
+              </View>
+
+              {/*<EditTextControls />*/}
+            </View>
+            <View style={styles.audioRecorderContainer}>
+              <SpeechRecognizer user={this.state.user} embedded={true}
+                                isDark={this.state.isDark}
+                                onSpeechResult={text => this.handleSpeechResult(text)}
+              />
+              {/*<AudioRecorder user={this.state.user} firebasePath={this.state.entryRef?.id} embedded={true} isDark={this.state.isDark}/>*/}
+            </View>
           </View>
-          <View style={styles.border} />
-          <View style={styles.textContainer}>
-            <Text style={styles.textLeft}>18/11/22</Text>
-            <TouchableOpacity>
-              <Text style={styles.textRight}>#work</Text>
-            </TouchableOpacity>
-
-          </View>
-          <Text style={styles.title}>{entry.title}</Text>
-
-          <View style={styles.blockContainer}>
-            <TextInput
-              style={styles.text}
-              value={entry.text}
-              multiline={true}
-              keyboardAppearance="default"
-              inputMode="text"
-              onChangeText={text => this.handleInputChange(text)}
-              onBlur={() => this.saveChanges(entry)}
-              returnKeyType={"done"}  onSelectionChange={this.handleSelectionChange}
-              showSoftInputOnFocus={false}
-            />
-
-          </View>
-
-          {/*<EditTextControls />*/}
-        </View>
-          <View style={styles.audioRecorderContainer}>
-            <AudioRecorder user={this.state.user} firebasePath={this.state.entryRef?.id} embedded={true}
-            isDark={this.state.isDark}/>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     );
   }
+
+  handleSpeechResult = (text: string) => {
+    let newText = "";
+
+    if (!this.state.entry)
+      return;
+    if (this.state.entry.selection) {
+      // Get the selection start and end
+      const selectionStart = this.state.entry.selection.start;
+      const selectionEnd = this.state.entry.selection.end;
+
+      // Cut the original text into two parts: before the selection and after the selection
+      const textBeforeSelection = this.state.entry.text.slice(0, selectionStart);
+      const textAfterSelection = this.state.entry.text.slice(selectionEnd);
+
+      // Insert the new text in between these two parts
+      newText = textBeforeSelection + text + textAfterSelection;
+    } else {
+      // If the selection is not defined, append the new text to the end of the existing text
+      newText = this.state.entry.text + "\n" + text;
+    }
+
+    this.handleInputChange(newText);
+  };
+
+  handleInputChange(text: string) {
+    this.setState(prevState => {
+      if (!prevState.entry)
+        return;
+
+      let entry = {...prevState.entry};
+      entry.text = text;
+
+      if (this.debounce) {
+        clearTimeout(this.debounce);
+      }
+
+      this.debounce = setTimeout(async () => {
+        console.clear()
+        console.log("---------TEXT",text);
+        await this.state.entryRef?.update(entry);
+      }, 1000);
+
+      return { entry };
+    });
+  }
+
+
+  handleSelectionChange = ({ nativeEvent: { selection } }) => {
+    const { entry } = this.state;
+    if (!entry) return;
+    entry.selection = selection;
+    this.setState({ entry });
+    // this.state.entryRef?.update(entry)
+  };
 
   componentDidMount(): void {
 
     this.unsubscribeAuth = auth().onAuthStateChanged(async user => {
-      if(!user)
-        return
+      if (!user)
+        return;
       const { entryId } = this.props.route.params;
       const entryRef = firestore().collection("users").doc(user.uid).collection("entries").doc(entryId);
 
-      this.setState({ user,entryRef });
-      console.log(this.state)
-      console.log('path',this.state.entryRef?.path)
+      this.setState({ user, entryRef });
       await this.fetchEntry();
     });
     this.colorSchemeSubscription = Appearance.addChangeListener(({ colorScheme }) => {
@@ -175,7 +236,6 @@ class NoteDetailsScreen extends Component<Props, State> {
   }
 
   async deleteEntry() {
-    const { entryId } = this.props.route.params;
 
     try {
       await this.state.entryRef?.delete();
@@ -186,26 +246,7 @@ class NoteDetailsScreen extends Component<Props, State> {
       console.error("Error deleting entry: ", error);
     }
   }
-  handleSelectionChange = ({ nativeEvent: { selection } }) => {
-    const { entry } = this.state;
-    if(!entry)return
-    console.log('selection',selection)
-    entry.selection= selection
-    this.setState({ entry });
-    this.state.entryRef?.update(entry)
-  };
 
-
-  handleInputChange(text: string) {
-
-    if (!this.state.entry)
-      return;
-    let entry = this.state.entry;
-    entry.text = text;
-    this.setState({ entry });
-    console.log(this.state.entry);
-
-  }
 
   async saveChanges(entry: Entry) {
     console.log("save the changes!!!");
@@ -223,12 +264,12 @@ const dynamicStyles = (isDark = false) => {
     },
     container: {
       flex: 1,
-      paddingHorizontal: 20,
+      paddingHorizontal: 20
     },
     audioRecorderContainer: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
-      width: '100%',
+      width: "100%"
     },
     headerContainer: {
       flexDirection: "row",

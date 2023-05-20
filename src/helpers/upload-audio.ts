@@ -8,7 +8,6 @@ const uploadAudio = async (
 ) => {
   if (audioPath) {
     const token = await getFirebaseStorageToken(uid);
-    console.log('token', token);
     if (!token) {
       console.error('Failed to get Firebase Storage token');
       return;
@@ -25,9 +24,6 @@ const uploadAudio = async (
         type: 'audio/m4a',
         name: filename,
       });
-      console.log('url', url);
-      console.log('data', data);
-
       // Add metadata with user UID
       const metadata = {
         contentType: 'application/json',
@@ -46,8 +42,6 @@ const uploadAudio = async (
           'X-Goog-Metadata': metadataString, // Include metadata in the request header
         },
       });
-
-      console.log('File uploaded successfully !!!!!');
 
       return result;
     } catch (error) {

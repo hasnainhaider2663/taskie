@@ -57,7 +57,6 @@ class NotesListComponent extends Component<any, State> {
         .collection("entries")
         .onSnapshot(querySnapshot => {
           const entries = querySnapshot.docs.map(doc => doc.data() as Entry);
-          console.log("entries", entries);
 
           this.setState({ entries });
         });
@@ -89,8 +88,7 @@ class NotesListComponent extends Component<any, State> {
             : null,
           index === 0 ? { borderTopWidth: 0 } : null,
         ]}
-        onPress={() => this.handleNavigateToDetails(item.id)}
-      >
+        onPress={() => this.handleNavigateToDetails(item.id)}>
         <Text style={styles.index}>
           {padWithZeroes(itemNumber, this.state.entries.length.toString().length)}/
         </Text>

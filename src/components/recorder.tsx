@@ -45,7 +45,6 @@ class AudioRecorder extends Component<Props, State> {
     const timestamp = new Date().getTime();
     const firebasePath = this.props.firebasePath || `${this.props.user.uid}_${timestamp}`;
     const firebaseFileName = `${firebasePath}/${timestamp}.m4a`;
-    console.log("fb0", firebasePath);
     this.state = {
       isRecording: false,
       isPlaying: false,
@@ -148,7 +147,6 @@ class AudioRecorder extends Component<Props, State> {
     firestoreDoc.onSnapshot(documentSnapshot => {
       if (documentSnapshot.exists) {
         const data = documentSnapshot.data();
-        console.log(data);
         this.setState({ doc: data });
       }
     });
